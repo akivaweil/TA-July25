@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <FastAccelStepper.h>
-#include <ESP32Servo.h>
+#include "ServoControl.h"
 #include <Bounce2.h>
 #include "globals.h"
 
@@ -27,7 +27,7 @@ void handleOTA();
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *xStepper = NULL;
 FastAccelStepper *zStepper = NULL;
-Servo swivelArmServo;
+ServoControl swivelArmServo;
 
 //* ************************************************************************
 //* ************************ BOUNCE2 OBJECTS *******************************
@@ -135,13 +135,7 @@ void setupSteppers() {
   vacuumActive = false;
 }
 
-/*
-void setupServo() {
-  swivelArmServo.attach(SERVO_PIN);
-  swivelArmServo.write(SERVO_HOME_POS);
-  // Note: Removed blocking delay for smooth stepper operation
-}
-*/
+
 
 //* ************************************************************************
 //* ************************ MAIN LOOP - STATE MACHINE ********************

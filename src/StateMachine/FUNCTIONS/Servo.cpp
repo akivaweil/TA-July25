@@ -1,11 +1,20 @@
-// This file will contain functions for controlling the servo motor.
+//* ************************************************************************
+//* ************************ SERVO FUNCTIONS *******************************
+//* ************************************************************************
+// This file contains functions for controlling the servo motor using custom ServoControl class
+
+#include "ServoControl.h"
 #include "globals.h"
-#include <ESP32Servo.h>
 
-// Servo swivelArmServo; // Definition is in main.cpp
+// ServoControl swivelArmServo; // Definition is in main.cpp
 
+//* ************************************************************************
+//* ************************ SERVO SETUP ***********************************
+//* ************************************************************************
 void setupServo() {
-  swivelArmServo.attach(SERVO_PIN);
+  // Initialize servo with PWM channel 0
+  swivelArmServo.init(SERVO_PIN, 0);
+  // Set servo to home position
   swivelArmServo.write(SERVO_HOME_POS);
   // Note: Removed blocking delay for smooth stepper operation
 } 

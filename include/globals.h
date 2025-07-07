@@ -3,7 +3,7 @@
 
 #include <Bounce2.h>
 #include <FastAccelStepper.h>
-#include <ESP32Servo.h>
+#include "ServoControl.h"
 #include "config/Config.h"
 #include "config/Pins_Definitions.h"
 
@@ -21,7 +21,7 @@ extern FastAccelStepperEngine engine;
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 
-extern Servo swivelArmServo;
+extern ServoControl swivelArmServo;
 
 //* ************************************************************************
 //* ************************ STATE DEFINITIONS *****************************

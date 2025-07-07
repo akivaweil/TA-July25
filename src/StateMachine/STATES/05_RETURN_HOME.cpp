@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include <FastAccelStepper.h>
-#include <ESP32Servo.h>
+#include "ServoControl.h"
 #include "globals.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
-extern Servo swivelArmServo;
+extern ServoControl swivelArmServo;
 
 //* ************************************************************************
 //* ************************ RETURN HOME STATE *****************************

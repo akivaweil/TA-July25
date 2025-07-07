@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <FastAccelStepper.h>
-#include <ESP32Servo.h>
+#include "ServoControl.h"
 #include "globals.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
-extern Servo swivelArmServo;
+extern ServoControl swivelArmServo;
 extern unsigned long stateTimer;
 extern bool vacuumActive;
 
@@ -21,10 +21,10 @@ bool handlePickup() {
     case PICKUP_MOVE_X:
       if (xStepper) {
         xStepper->moveTo((int32_t)X_PICKUP_POS);
-      }
-      if (isMotorAtTarget(xStepper)) {
-        swivelArmServo.write((int)SERVO_PICKUP_POS);
-        pickupState = PICKUP_LOWER_Z;
+        if (isMotorAtTarget(xStepper)) {
+          swivelArmServo.write((int)SERVO_PICKUP_POS);
+          pickupState = PICKUP_LOWER_Z;
+        }
       }
       break;
       
