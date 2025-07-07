@@ -1092,5 +1092,3 @@ bool handleReturnHome() {
   return false;  // Return not complete
 } 
 // --- END OF FILE: src/StateMachine/STATES/05_RETURN_HOME.cpp ---
-
-</rewritten_file>
