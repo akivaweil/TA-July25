@@ -3,10 +3,6 @@
 		{
 			"name": "TA July25",
 			"path": ".."
-		},
-		{
-			"name": "Esp32 servo test",
-			"path": "../../Esp32 servo test"
 		}
 	],
     "settings": {}

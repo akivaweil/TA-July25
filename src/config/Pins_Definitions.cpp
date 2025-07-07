@@ -21,6 +21,6 @@ int Z_STEP_PIN = 19;          // Z-axis stepper motor step pin
 int Z_DIR_PIN = 18;           // Z-axis stepper motor direction pin
 
 // OUTPUT PINS - ACTUATORS
-int SERVO_PIN = 26;           // Servo control pin
+int SERVO_PIN = 12;           // Servo control pin
 int SOLENOID_RELAY_PIN = 33;  // Solenoid relay control pin
 int STAGE2_SIGNAL_PIN = 25;   // Signal output to Stage 2 machine (active high) 
