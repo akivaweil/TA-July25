@@ -22,8 +22,8 @@ bool handleDropoff() {
       }
       
       if (zStepper) {
-        zStepper->setSpeedInHz((uint32_t)Z_DROPOFF_SPEED);  // Slower for dropoff
-        zStepper->moveTo((int32_t)Z_DROPOFF_POS);
+        zStepper->setSpeedInHz(Z_DROPOFF_SPEED);  // Slower for dropoff
+        zStepper->moveTo(Z_DROPOFF_POS);
       }
       if (isMotorAtTarget(zStepper)) {
         deactivateVacuum();
@@ -36,10 +36,10 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_WAIT:
-      if (waitForTime((unsigned long)DROPOFF_HOLD_TIME)) {
+      if (waitForTime(DROPOFF_HOLD_TIME)) {
         if (zStepper) {
-          zStepper->setSpeedInHz((uint32_t)Z_MAX_SPEED);  // Back to normal speed
-          zStepper->moveTo((int32_t)Z_UP_POS);
+          zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
+          zStepper->moveTo(Z_UP_POS);
         }
         dropoffState = DROPOFF_RAISE_Z;
       }
@@ -47,7 +47,7 @@ bool handleDropoff() {
       
     case DROPOFF_RAISE_Z:
       if (isMotorAtTarget(zStepper)) {
-        digitalWrite((int)STAGE2_SIGNAL_PIN, HIGH);  // Signal Stage 2
+        digitalWrite(STAGE2_SIGNAL_PIN, HIGH);  // Signal Stage 2
         dropoffState = DROPOFF_DONE;
       }
       break;

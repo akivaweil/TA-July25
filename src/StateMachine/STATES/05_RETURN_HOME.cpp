@@ -18,10 +18,10 @@ bool handleReturnHome() {
   
   switch(returnStep) {
     case 0:  // Signal Stage 2 and move X home
-      digitalWrite((int)STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
-      swivelArmServo.write((int)SERVO_HOME_POS);    // Reset servo
+      digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
+      swivelArmServo.write(SERVO_HOME_POS);    // Reset servo
       if (xStepper) {
-        xStepper->moveTo((int32_t)X_HOME_POS);           // Move X home
+        xStepper->moveTo(X_HOME_POS);           // Move X home
       }
       returnStep = 1;
       break;
@@ -29,7 +29,7 @@ bool handleReturnHome() {
     case 1:  // Wait for X to reach home
       if (isMotorAtTarget(xStepper)) {
         if (xStepper) {
-          xStepper->moveTo((int32_t)X_PICKUP_POS);
+          xStepper->moveTo(X_PICKUP_POS);
         }
         returnStep = 2;
       }

@@ -121,15 +121,15 @@ void setupSteppers() {
     xStepper->setDirectionPin(X_DIR_PIN);
     xStepper->setEnablePin(X_ENABLE_PIN);
     xStepper->setAutoEnable(true);
-    xStepper->setSpeedInHz((uint32_t)X_MAX_SPEED);
-    xStepper->setAcceleration((uint32_t)X_ACCELERATION);
+    xStepper->setSpeedInHz(X_MAX_SPEED);
+    xStepper->setAcceleration(X_ACCELERATION);
   }
   
   zStepper = engine.stepperConnectToPin(Z_STEP_PIN);
   if (zStepper) {
     zStepper->setDirectionPin(Z_DIR_PIN);
-    zStepper->setSpeedInHz((uint32_t)Z_MAX_SPEED);
-    zStepper->setAcceleration((uint32_t)Z_ACCELERATION);
+    zStepper->setSpeedInHz(Z_MAX_SPEED);
+    zStepper->setAcceleration(Z_ACCELERATION);
   }
   
   vacuumActive = false;

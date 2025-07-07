@@ -20,9 +20,9 @@ bool handlePickup() {
   switch(pickupState) {
     case PICKUP_MOVE_X:
       if (xStepper) {
-        xStepper->moveTo((int32_t)X_PICKUP_POS);
+        xStepper->moveTo(X_PICKUP_POS);
         if (isMotorAtTarget(xStepper)) {
-          swivelArmServo.write((int)SERVO_PICKUP_POS);
+          swivelArmServo.write(SERVO_PICKUP_POS);
           pickupState = PICKUP_LOWER_Z;
         }
       }
@@ -30,9 +30,9 @@ bool handlePickup() {
       
     case PICKUP_LOWER_Z:
       if (zStepper) {
-        zStepper->moveTo((int32_t)Z_PICKUP_POS);
+        zStepper->moveTo(Z_PICKUP_POS);
         // Activate vacuum when halfway down
-        if (zStepper->getCurrentPosition() <= (int32_t)Z_SUCTION_START_POS && !vacuumActive) {
+        if (zStepper->getCurrentPosition() <= Z_SUCTION_START_POS && !vacuumActive) {
           activateVacuum();
         }
       }
@@ -42,9 +42,9 @@ bool handlePickup() {
       break;
       
     case PICKUP_WAIT:
-      if (waitForTime((unsigned long)PICKUP_HOLD_TIME)) {
+      if (waitForTime(PICKUP_HOLD_TIME)) {
         if (zStepper) {
-          zStepper->moveTo((int32_t)Z_UP_POS);
+          zStepper->moveTo(Z_UP_POS);
         }
         pickupState = PICKUP_RAISE_Z;
       }

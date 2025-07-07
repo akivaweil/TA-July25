@@ -47,9 +47,9 @@ int Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH); // Z p
 //* ************************************************************************
 // Servo settings (in degrees)
 int SERVO_HOME_POS = 100;      // Neutral position
-int SERVO_PICKUP_POS = 10;    // Pickup orientation (updated from original)
-int SERVO_TRAVEL_POS = 0;     // Travel position (updated from original)
-int SERVO_DROPOFF_POS = 80;   // Dropoff orientation (updated from original)
+int SERVO_PICKUP_POS = 100;    // Pickup orientation (updated from original)
+int SERVO_TRAVEL_POS =80;     // Travel position (updated from original)
+int SERVO_DROPOFF_POS = 160;   // Dropoff orientation (updated from original)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************

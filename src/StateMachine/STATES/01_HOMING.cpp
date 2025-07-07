@@ -20,7 +20,7 @@ bool handleHoming() {
   switch(homingStep) {
     case 0:  // Start Z homing
       if (zStepper) {
-        zStepper->setSpeedInHz((uint32_t)Z_HOME_SPEED);
+        zStepper->setSpeedInHz(Z_HOME_SPEED);
         zStepper->move(-50000);  // Move negative direction
       }
       homingStep = 1;
@@ -30,9 +30,9 @@ bool handleHoming() {
       if (zHomeSwitch.read() == HIGH) {
         if (zStepper) {
           zStepper->forceStop();
-          zStepper->setCurrentPosition((int32_t)Z_HOME_POS);
-          zStepper->setSpeedInHz((uint32_t)Z_MAX_SPEED);
-          zStepper->moveTo((int32_t)Z_UP_POS);  // Move up 5 inches
+          zStepper->setCurrentPosition(Z_HOME_POS);
+          zStepper->setSpeedInHz(Z_MAX_SPEED);
+          zStepper->moveTo(Z_UP_POS);  // Move up 5 inches
         }
         homingStep = 2;
       }
@@ -41,7 +41,7 @@ bool handleHoming() {
     case 2:  // Wait for Z to reach up position
       if (isMotorAtTarget(zStepper)) {
         if (xStepper) {
-          xStepper->setSpeedInHz((uint32_t)X_HOME_SPEED);
+          xStepper->setSpeedInHz(X_HOME_SPEED);
           xStepper->move(-50000);  // Move negative direction
         }
         homingStep = 3;
@@ -52,9 +52,9 @@ bool handleHoming() {
       if (xHomeSwitch.read() == HIGH) {
         if (xStepper) {
           xStepper->forceStop();
-          xStepper->setCurrentPosition((int32_t)X_HOME_POS);
-          xStepper->setSpeedInHz((uint32_t)X_MAX_SPEED);
-          xStepper->moveTo((int32_t)X_PICKUP_POS);  // Move to pickup
+          xStepper->setCurrentPosition(X_HOME_POS);
+          xStepper->setSpeedInHz(X_MAX_SPEED);
+          xStepper->moveTo(X_PICKUP_POS);  // Move to pickup
         }
         homingStep = 4;
       }

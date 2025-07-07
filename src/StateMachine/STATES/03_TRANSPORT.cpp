@@ -17,24 +17,24 @@ extern unsigned long stateTimer;
 bool handleTransport() {
   switch(transportState) {
     case TRANSPORT_ROTATE_SERVO:
-      swivelArmServo.write((int)SERVO_TRAVEL_POS);
+      swivelArmServo.write(SERVO_TRAVEL_POS);
       if (xStepper) {
-        xStepper->moveTo((int32_t)X_OVERSHOOT_POS);
+        xStepper->moveTo(X_OVERSHOOT_POS);
       }
       transportState = TRANSPORT_MOVE_TO_OVERSHOOT;
       break;
       
     case TRANSPORT_MOVE_TO_OVERSHOOT:
       if (isMotorAtTarget(xStepper)) {
-        swivelArmServo.write((int)SERVO_DROPOFF_POS);
+        swivelArmServo.write(SERVO_DROPOFF_POS);
         transportState = TRANSPORT_WAIT_SERVO;
       }
       break;
       
     case TRANSPORT_WAIT_SERVO:
-      if (waitForTime((unsigned long)SERVO_ROTATION_TIME)) {
+      if (waitForTime(SERVO_ROTATION_TIME)) {
         if (xStepper) {
-          xStepper->moveTo((int32_t)X_DROPOFF_POS);
+          xStepper->moveTo(X_DROPOFF_POS);
         }
         transportState = TRANSPORT_MOVE_TO_DROPOFF;
       }
