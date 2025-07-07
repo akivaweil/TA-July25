@@ -3,6 +3,7 @@
 
 #include <Bounce2.h>
 #include <FastAccelStepper.h>
+#include <ESP32Servo.h>
 #include "config/Config.h"
 #include "config/Pins_Definitions.h"
 
@@ -15,6 +16,12 @@ extern Bounce zHomeSwitch;
 extern Bounce startButton;
 extern Bounce stage1Signal;
 extern Bounce stopSignalStage2;
+
+extern FastAccelStepperEngine engine;
+extern FastAccelStepper *xStepper;
+extern FastAccelStepper *zStepper;
+
+extern Servo swivelArmServo;
 
 //* ************************************************************************
 //* ************************ STATE DEFINITIONS *****************************
@@ -59,6 +66,8 @@ extern SystemState systemState;
 extern PickupState pickupState;
 extern TransportState transportState;
 extern DropoffState dropoffState;
+
+extern bool vacuumActive;
 
 //* ************************************************************************
 //* ************************ FUNCTION DECLARATIONS *************************

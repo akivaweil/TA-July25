@@ -6,7 +6,7 @@
 
 // Function declarations
 void setupPins();
-void setupSteppers(); 
+void setupSteppers();
 void setupServo();
 void setupDebouncers();
 bool handleHoming();
@@ -77,57 +77,57 @@ void setup() {
 //* ************************************************************************
 void setupPins() {
   // Input pins
-  pinMode((int)START_BUTTON_PIN, INPUT_PULLDOWN);
-  pinMode((int)STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
-  pinMode((int)X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
-  pinMode((int)Z_HOME_SWITCH_PIN, INPUT_PULLDOWN);
-  pinMode((int)STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
+  pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
+  pinMode(STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
+  pinMode(X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
+  pinMode(Z_HOME_SWITCH_PIN, INPUT_PULLDOWN);
+  pinMode(STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
   
   // Output pins
-  pinMode((int)X_ENABLE_PIN, OUTPUT);
-  pinMode((int)SOLENOID_RELAY_PIN, OUTPUT);
-  pinMode((int)STAGE2_SIGNAL_PIN, OUTPUT);
+  pinMode(X_ENABLE_PIN, OUTPUT);
+  pinMode(SOLENOID_RELAY_PIN, OUTPUT);
+  pinMode(STAGE2_SIGNAL_PIN, OUTPUT);
   
   // Initial states
-  digitalWrite((int)X_ENABLE_PIN, LOW);   // Enable X motor for smooth operation
-  digitalWrite((int)SOLENOID_RELAY_PIN, LOW);  // Vacuum off
-  digitalWrite((int)STAGE2_SIGNAL_PIN, LOW);   // Stage 2 signal off
+  digitalWrite(X_ENABLE_PIN, LOW);   // Enable X motor for smooth operation
+  digitalWrite(SOLENOID_RELAY_PIN, LOW);  // Vacuum off
+  digitalWrite(STAGE2_SIGNAL_PIN, LOW);   // Stage 2 signal off
 }
 
 void setupDebouncers() {
   // Configure limit switches with 2ms debounce (same as Transfer-Arm_TA-June25)
-  xHomeSwitch.attach((int)X_HOME_SWITCH_PIN);
+  xHomeSwitch.attach(X_HOME_SWITCH_PIN);
   xHomeSwitch.interval(2);  // 2ms debounce
   
-  zHomeSwitch.attach((int)Z_HOME_SWITCH_PIN);
+  zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
   zHomeSwitch.interval(2);  // 2ms debounce
   
   // Configure input signals with 10ms debounce
-  startButton.attach((int)START_BUTTON_PIN);
+  startButton.attach(START_BUTTON_PIN);
   startButton.interval(10);  // 10ms debounce
   
-  stage1Signal.attach((int)STAGE1_SIGNAL_PIN);
+  stage1Signal.attach(STAGE1_SIGNAL_PIN);
   stage1Signal.interval(10);  // 10ms debounce
   
-  stopSignalStage2.attach((int)STOP_SIGNAL_STAGE_2);
+  stopSignalStage2.attach(STOP_SIGNAL_STAGE_2);
   stopSignalStage2.interval(10);  // 10ms debounce
 }
 
 void setupSteppers() {
   engine.init();
   
-  xStepper = engine.stepperConnectToPin((int)X_STEP_PIN);
+  xStepper = engine.stepperConnectToPin(X_STEP_PIN);
   if (xStepper) {
-    xStepper->setDirectionPin((int)X_DIR_PIN);
-    xStepper->setEnablePin((int)X_ENABLE_PIN);
+    xStepper->setDirectionPin(X_DIR_PIN);
+    xStepper->setEnablePin(X_ENABLE_PIN);
     xStepper->setAutoEnable(true);
     xStepper->setSpeedInHz((uint32_t)X_MAX_SPEED);
     xStepper->setAcceleration((uint32_t)X_ACCELERATION);
   }
   
-  zStepper = engine.stepperConnectToPin((int)Z_STEP_PIN);
+  zStepper = engine.stepperConnectToPin(Z_STEP_PIN);
   if (zStepper) {
-    zStepper->setDirectionPin((int)Z_DIR_PIN);
+    zStepper->setDirectionPin(Z_DIR_PIN);
     zStepper->setSpeedInHz((uint32_t)Z_MAX_SPEED);
     zStepper->setAcceleration((uint32_t)Z_ACCELERATION);
   }
@@ -135,11 +135,13 @@ void setupSteppers() {
   vacuumActive = false;
 }
 
+/*
 void setupServo() {
-  swivelArmServo.attach((int)SERVO_PIN);
-  swivelArmServo.write((int)SERVO_HOME_POS);
+  swivelArmServo.attach(SERVO_PIN);
+  swivelArmServo.write(SERVO_HOME_POS);
   // Note: Removed blocking delay for smooth stepper operation
 }
+*/
 
 //* ************************************************************************
 //* ************************ MAIN LOOP - STATE MACHINE ********************
@@ -206,11 +208,6 @@ void loop() {
 //* ************************************************************************
 //* ************************ UTILITY FUNCTIONS ****************************
 //* ************************************************************************
-bool isMotorAtTarget(FastAccelStepper* motor) {
-  if (!motor) return true;
-  return !motor->isRunning();
-}
-
 bool waitForTime(unsigned long duration) {
   if (stateTimer == 0) {
     stateTimer = millis();
@@ -225,30 +222,8 @@ bool waitForTime(unsigned long duration) {
   return false;
 }
 
-void activateVacuum() {
-  digitalWrite((int)SOLENOID_RELAY_PIN, HIGH);
-  vacuumActive = true;
-}
-
-void deactivateVacuum() {
-  digitalWrite((int)SOLENOID_RELAY_PIN, LOW);
-  vacuumActive = false;
-}
-
-void enableXMotor() {
-  if (xStepper) {
-    xStepper->enableOutputs();
-  }
-}
-
-void disableXMotor() {
-  if (xStepper) {
-    xStepper->disableOutputs();
-  }
-}
-
 //* ************************************************************************
-//* ************************ SERIAL COMMUNICATION **************************
+//* ************************ SERIAL HANDLER *******************************
 //* ************************************************************************
 void handleSerial() {
   // This function can be used to handle serial commands for debugging
