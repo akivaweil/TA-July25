@@ -184,7 +184,7 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        systemState = STATE_RETURN_HOME;
+        systemState = STATE_IDLE;  // Skip RETURN_HOME, handled in dropoff
       }
       break;
       

@@ -42,6 +42,7 @@ extern int Z_UP_POS;     // Z-axis fully up position
 extern int Z_PICKUP_POS;     // Z down for pickup
 extern int Z_DROPOFF_POS;   // Z down for dropoff
 extern int Z_SUCTION_START_POS; // Z position to start suction
+extern int Z_EARLY_RETURN_POS; // Z position to start X return home
 
 //* ************************************************************************
 //* ************************ SERVO SETTINGS ********************************
@@ -59,6 +60,12 @@ extern int SERVO_DROPOFF_POS;   // Dropoff orientation
 extern int PICKUP_HOLD_TIME;     // Hold time at pickup position
 extern int DROPOFF_HOLD_TIME;    // Hold time at dropoff position
 extern int SERVO_ROTATION_TIME;  // Wait time for servo rotation
+
+//* ************************************************************************
+//* ************************ DROPOFF SETTINGS ******************************
+//* ************************************************************************
+// Dropoff behavior settings
+extern float Z_EARLY_RETURN_INCHES;  // Z distance to travel up before starting X return home
 
 //* ************************************************************************
 //* ************************ STEPPER MOTOR SETTINGS ***********************

@@ -22,8 +22,8 @@ float X_PICKUP_INCHES = 0.5;     // X pickup position
 float X_DROPOFF_INCHES = 20.40;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
-float Z_PICKUP_LOWER_INCHES = 7.0;     // Lower Z by 7" for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 5.5;    // Lower Z by 5.5" for dropoff
+float Z_PICKUP_LOWER_INCHES = 6.7;     // Lower Z by 7" for pickup (updated from original)
+float Z_DROPOFF_LOWER_INCHES = 6.3;    // Lower Z by 5.5" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 
 //* ************************************************************************
@@ -41,6 +41,7 @@ int Z_UP_POS = 0;     // Z-axis fully up position
 int Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);     // Z down for pickup
 int Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);   // Z down for dropoff
 int Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH); // Z position to start suction
+int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z position to start X return home
 
 //* ************************************************************************
 //* ************************ SERVO SETTINGS ********************************
@@ -58,6 +59,12 @@ int SERVO_DROPOFF_POS = 160;   // Dropoff orientation (updated from original)
 int PICKUP_HOLD_TIME = 300;     // Hold time at pickup position
 int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
+
+//* ************************************************************************
+//* ************************ DROPOFF SETTINGS ******************************
+//* ************************************************************************
+// Dropoff behavior settings
+float Z_EARLY_RETURN_INCHES = 2.0;  // Z distance to travel up before starting X return home
 
 //* ************************************************************************
 //* ************************ STEPPER MOTOR SETTINGS ***********************
