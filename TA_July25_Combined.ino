@@ -404,8 +404,8 @@ using ServoDouble = ServoTemplate<double>;
 #include <Bounce2.h>
 #include <FastAccelStepper.h>
 #include <ESP32Servo.h>
-#include "config/Config.h"
-#include "config/Pins_Definitions.h"
+// #include "config/Config.h" // Removed for single-file compilation
+// #include "config/Pins_Definitions.h" // Removed for single-file compilation
 
 //* ************************************************************************
 //* ************************ BOUNCE2 OBJECTS ******************************
@@ -499,7 +499,7 @@ void disableXMotor();
 // --- END OF FILE: include/globals.h ---
 
 // --- START OF FILE: src/config/Config.cpp ---
-#include "config/Config.h"
+// #include "config/Config.h" // Removed for single-file compilation
 
 //* ************************************************************************
 //* ************************* CONFIGURATION *******************************
@@ -575,7 +575,7 @@ int Z_DROPOFF_SPEED = 10000; // Same speed as normal for dropoff
 // --- END OF FILE: src/config/Config.cpp ---
 
 // --- START OF FILE: src/config/Pins_Definitions.cpp ---
-#include "config/Pins_Definitions.h"
+// #include "config/Pins_Definitions.h" // Removed for single-file compilation
 
 //* ************************************************************************
 //* ************************ PIN DEFINITIONS ******************************
@@ -608,7 +608,7 @@ int STAGE2_SIGNAL_PIN = 25;   // Signal output to Stage 2 machine (active high)
 #include <FastAccelStepper.h>
 #include <ESP32Servo.h>
 #include <Bounce2.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // Function declarations
 void setupPins();
@@ -988,7 +988,7 @@ void displayIP() {
 
 // --- START OF FILE: src/StateMachine/FUNCTIONS/Motors.cpp ---
 // This file will contain functions for controlling the stepper motors.
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 bool isMotorAtTarget(FastAccelStepper* motor) {
   if (!motor) return true;
@@ -1010,7 +1010,7 @@ void disableXMotor() {
 
 // --- START OF FILE: src/StateMachine/FUNCTIONS/Pneumatics.cpp ---
 // This file will contain functions for controlling the pneumatics (solenoid).
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 void activateVacuum() {
   digitalWrite(SOLENOID_RELAY_PIN, HIGH);
@@ -1025,12 +1025,12 @@ void deactivateVacuum() {
 
 // --- START OF FILE: src/StateMachine/FUNCTIONS/Sensors.cpp ---
 // This file will contain functions for reading sensors and inputs.
-#include "globals.h" 
+// #include "globals.h" // Removed for single-file compilation
 // --- END OF FILE: src/StateMachine/FUNCTIONS/Sensors.cpp ---
 
 // --- START OF FILE: src/StateMachine/FUNCTIONS/Servo.cpp ---
 // This file will contain functions for controlling the servo motor.
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 #include <ESP32Servo.h>
 
 // Servo swivelArmServo; // Definition is in main.cpp
@@ -1044,7 +1044,7 @@ void setupServo() {
 
 // --- START OF FILE: src/StateMachine/STATES/00_IDLE.cpp ---
 #include <Arduino.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 //* ************************************************************************
 //* ************************ IDLE STATE ************************************
@@ -1066,7 +1066,7 @@ bool handleIdle() {
 // --- START OF FILE: src/StateMachine/STATES/01_HOMING.cpp ---
 #include <Arduino.h>
 #include <FastAccelStepper.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -1142,7 +1142,7 @@ bool handleHoming() {
 #include <Arduino.h>
 #include <FastAccelStepper.h>
 #include <ESP32Servo.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -1210,7 +1210,7 @@ bool handlePickup() {
 #include <Arduino.h>
 #include <FastAccelStepper.h>
 #include <ESP32Servo.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -1267,7 +1267,7 @@ bool handleTransport() {
 // --- START OF FILE: src/StateMachine/STATES/04_DROPOFF.cpp ---
 #include <Arduino.h>
 #include <FastAccelStepper.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // External references to objects defined in main file
 extern FastAccelStepper *zStepper;
@@ -1332,7 +1332,7 @@ bool handleDropoff() {
 #include <Arduino.h>
 #include <FastAccelStepper.h>
 #include <ESP32Servo.h>
-#include "globals.h"
+// #include "globals.h" // Removed for single-file compilation
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
