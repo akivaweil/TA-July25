@@ -409,10 +409,10 @@ void setupPins() {
 void setupDebouncers() {
   // Configure limit switches with 2ms debounce (same as Transfer-Arm_TA-June25)
   xHomeSwitch.attach(X_HOME_SWITCH_PIN);
-  xHomeSwitch.interval(2);  // 2ms debounce
+  xHomeSwitch.interval(1);  // 2ms debounce
   
   zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
-  zHomeSwitch.interval(2);  // 2ms debounce
+  zHomeSwitch.interval(1);  // 2ms debounce
   
   // Configure input signals with 10ms debounce
   startButton.attach(START_BUTTON_PIN);

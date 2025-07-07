@@ -18,8 +18,8 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************ POSITION SETTINGS *****************************
 //* ************************************************************************
 // Position settings (in inches from home)
-float X_PICKUP_INCHES = 1.0;     // X pickup position
-float X_DROPOFF_INCHES = 20.95;  // X dropoff position (updated from original)
+float X_PICKUP_INCHES = 0.5;     // X pickup position
+float X_DROPOFF_INCHES = 20.40;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
 float Z_PICKUP_LOWER_INCHES = 7.0;     // Lower Z by 7" for pickup (updated from original)
@@ -46,8 +46,8 @@ int Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH); // Z p
 //* ************************ SERVO SETTINGS ********************************
 //* ************************************************************************
 // Servo settings (in degrees)
-int SERVO_HOME_POS = 100;      // Neutral position
-int SERVO_PICKUP_POS = 100;    // Pickup orientation (updated from original)
+int SERVO_HOME_POS = 103;      // Neutral position
+int SERVO_PICKUP_POS = 103;    // Pickup orientation (updated from original)
 int SERVO_TRAVEL_POS =80;     // Travel position (updated from original)
 int SERVO_DROPOFF_POS = 160;   // Dropoff orientation (updated from original)
 
@@ -65,9 +65,9 @@ int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
 // Stepper motor settings (updated from original)
 int X_MAX_SPEED = 7000;  // Steps per second
 int X_ACCELERATION = 10000; // Steps per second^2
-int X_HOME_SPEED = 1000;    // Homing speed
+int X_HOME_SPEED = 700;    // Homing speed
 
 int Z_MAX_SPEED = 10000; // Steps per second
 int Z_ACCELERATION = 10000; // Steps per second^2
-int Z_HOME_SPEED = 1000;    // Homing speed
+int Z_HOME_SPEED = 700;    // Homing speed
 int Z_DROPOFF_SPEED = 10000; // Same speed as normal for dropoff 
