@@ -5,8 +5,8 @@
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
-extern Bounce zHomeSwitch;
 extern Bounce xHomeSwitch;
+// extern Bounce zHomeSwitch;  // Z-axis: no debouncing - direct reading
 
 //* ************************************************************************
 //* ************************ HOMING STATE **********************************
@@ -27,7 +27,7 @@ bool handleHoming() {
       break;
       
     case 1:  // Wait for Z home switch
-      if (zHomeSwitch.read() == HIGH) {
+      if (digitalRead(Z_HOME_SWITCH_PIN) == HIGH) {  // Z-axis: direct reading
         if (zStepper) {
           zStepper->forceStop();
           zStepper->setCurrentPosition(Z_HOME_POS);

@@ -34,7 +34,6 @@ ServoControl swivelArmServo;
 //* ************************ BOUNCE2 OBJECTS *******************************
 //* ************************************************************************
 Bounce xHomeSwitch = Bounce();
-Bounce zHomeSwitch = Bounce();
 Bounce startButton = Bounce();
 Bounce stage1Signal = Bounce();
 Bounce stopSignalStage2 = Bounce();
@@ -81,7 +80,7 @@ void setupPins() {
   pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
   pinMode(STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
   pinMode(X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
-  pinMode(Z_HOME_SWITCH_PIN, INPUT_PULLDOWN);
+  pinMode(Z_HOME_SWITCH_PIN, INPUT);  // Z-axis: direct high reading, no pull-down
   pinMode(STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
   
   // Output pins
@@ -100,8 +99,9 @@ void setupDebouncers() {
   xHomeSwitch.attach(X_HOME_SWITCH_PIN);
   xHomeSwitch.interval(2);  // 2ms debounce
   
-  zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
-  zHomeSwitch.interval(2);  // 2ms debounce
+  // Z-axis: no debouncing - direct reading
+  // zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
+  // zHomeSwitch.interval(2);  // 2ms debounce
   
   // Configure input signals with 10ms debounce
   startButton.attach(START_BUTTON_PIN);
@@ -143,9 +143,9 @@ void loop() {
   // Handle OTA updates
   handleOTA();
   
-  // Update all debouncers first
+  // Update all debouncers first (except Z-axis which uses direct reading)
   xHomeSwitch.update();
-  zHomeSwitch.update();
+  // zHomeSwitch.update();  // Z-axis: no debouncing - direct reading
   startButton.update();
   stage1Signal.update();
   stopSignalStage2.update();

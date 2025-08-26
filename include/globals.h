@@ -12,7 +12,7 @@
 //* ************************************************************************
 // Bounce2 objects for debounced inputs
 extern Bounce xHomeSwitch;
-extern Bounce zHomeSwitch;
+// extern Bounce zHomeSwitch;  // Z-axis: no debouncing - direct reading
 extern Bounce startButton;
 extern Bounce stage1Signal;
 extern Bounce stopSignalStage2;
