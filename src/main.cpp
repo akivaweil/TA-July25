@@ -3,6 +3,7 @@
 #include "ServoControl.h"
 #include <Bounce2.h>
 #include "globals.h"
+#include "OTA/OTA_Upload.h"
 
 // Function declarations
 void setupPins();
@@ -18,8 +19,8 @@ bool handleReturnHome();
 void handleSerial();
 
 // OTA function declarations (implemented in OTA_Manager.cpp)
-void initOTA();
-void handleOTA();
+// void initOTA();
+// void handleOTA();
 
 //* ************************************************************************
 //* ************************ HARDWARE OBJECTS *****************************
@@ -55,7 +56,7 @@ bool vacuumActive = false;
 //* ************************************************************************
 void setup() {
   // Initialize OTA functionality
-  initOTA();
+  setupOTA();
   
   // Configure pins
   setupPins();
@@ -134,8 +135,6 @@ void setupSteppers() {
   
   vacuumActive = false;
 }
-
-
 
 //* ************************************************************************
 //* ************************ MAIN LOOP - STATE MACHINE ********************
