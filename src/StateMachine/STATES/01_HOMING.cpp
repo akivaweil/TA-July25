@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <FastAccelStepper.h>
 #include "globals.h"
+#include "config/Pins_Definitions.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern Bounce xHomeSwitch;
-// extern Bounce zHomeSwitch;  // Z-axis: no debouncing - direct reading
 
 //* ************************************************************************
 //* ************************ HOMING STATE **********************************
@@ -27,7 +27,7 @@ bool handleHoming() {
       break;
       
     case 1:  // Wait for Z home switch
-      if (digitalRead(Z_HOME_SWITCH_PIN) == HIGH) {  // Z-axis: direct reading
+      if (digitalRead(Z_HOME_SWITCH_PIN) == HIGH) {
         if (zStepper) {
           zStepper->forceStop();
           zStepper->setCurrentPosition(Z_HOME_POS);

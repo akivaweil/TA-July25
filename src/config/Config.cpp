@@ -19,11 +19,11 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************************************************************
 // Position settings (in inches from home)
 float X_PICKUP_INCHES = 0.5;     // X pickup position
-float X_DROPOFF_INCHES = 20.153333;  // X dropoff position (updated from original)
+float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
-float Z_PICKUP_LOWER_INCHES = 6.6;     // Lower Z by 7" for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 6.6;    // Lower Z by 5.5" for dropoff
+float Z_PICKUP_LOWER_INCHES = 6.6;     // Lower Z by 6.55" for pickup (updated from original)
+float Z_DROPOFF_LOWER_INCHES = 6.6;    // Lower Z by 6.6" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 
 //* ************************************************************************
@@ -47,10 +47,10 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 //* ************************ SERVO SETTINGS ********************************
 //* ************************************************************************
 // Servo settings (in degrees)
-int SERVO_HOME_POS = 103;      // Neutral position
-int SERVO_PICKUP_POS = 85;    // Pickup orientation (updated from original)
-int SERVO_TRAVEL_POS = 70;     // Travel position (updated from original)
-int SERVO_DROPOFF_POS = 180;   // Dropoff orientation (updated from original)
+int SERVO_HOME_POS = 55;      // Neutral position (reduced by 25°)
+int SERVO_PICKUP_POS = 55;    // Pickup orientation (reduced by 25°)
+int SERVO_TRAVEL_POS = 35;     // Travel position (reduced by 25°)
+int SERVO_DROPOFF_POS = 175;   // Dropoff orientation (reduced by 25°)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
@@ -76,5 +76,5 @@ int X_HOME_SPEED = 700;    // Homing speed
 
 int Z_MAX_SPEED = 10000; // Steps per second
 int Z_ACCELERATION = 10000; // Steps per second^2
-int Z_HOME_SPEED = 700;    // Homing speed
+int Z_HOME_SPEED = 400;    // Homing speed
 int Z_DROPOFF_SPEED = 10000; // Same speed as normal for dropoff 
