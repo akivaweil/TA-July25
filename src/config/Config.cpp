@@ -22,8 +22,8 @@ float X_PICKUP_INCHES = 0.5;     // X pickup position
 float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
-float Z_PICKUP_LOWER_INCHES = 6.6;     // Lower Z by 6.55" for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 6.3;    // Lower Z by 6.3" for dropoff
+float Z_PICKUP_LOWER_INCHES = 6.3;     // Lower Z by 6.3" for pickup (updated from original)
+float Z_DROPOFF_LOWER_INCHES = 6.0;    // Lower Z by 6.0" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 
 //* ************************************************************************
@@ -50,7 +50,7 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 int SERVO_HOME_POS = 40;      // Neutral position (reduced by 40° total)
 int SERVO_PICKUP_POS = 40;    // Pickup orientation (reduced by 40° total)
 int SERVO_TRAVEL_POS = 20;     // Travel position (reduced by 40° total)
-int SERVO_DROPOFF_POS = 140;   // Dropoff orientation (reduced by 40° total)
+int SERVO_DROPOFF_POS = 130;   // Dropoff orientation (reduced by 40° total)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
