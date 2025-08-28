@@ -25,13 +25,19 @@ bool handleDropoff() {
       }
       
       if (zStepper) {
+        // Set target position for dropoff
         zStepper->setSpeedInHz(Z_DROPOFF_SPEED);  // Slower for dropoff
         zStepper->moveTo(Z_DROPOFF_POS);
       }
+      
+      // Wait for Z to fully reach dropoff position before proceeding
       if (isMotorAtTarget(zStepper)) {
-        deactivateVacuum();
-        delay(300); // Wait for vacuum to release
-        dropoffState = DROPOFF_RELEASE;
+        // Additional verification: ensure we're actually at the dropoff position
+        if (zStepper && abs(zStepper->getCurrentPosition() - Z_DROPOFF_POS) <= 10) {
+          deactivateVacuum();
+          delay(300); // Wait for vacuum to release
+          dropoffState = DROPOFF_RELEASE;
+        }
       }
       break;
       
@@ -41,6 +47,9 @@ bool handleDropoff() {
       
     case DROPOFF_WAIT:
       if (waitForTime(DROPOFF_HOLD_TIME)) {
+        // Add small delay to ensure Z is fully settled at dropoff position
+        delay(100);
+        
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
           zStepper->moveTo(Z_UP_POS);
