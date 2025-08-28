@@ -47,10 +47,10 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 //* ************************ SERVO SETTINGS ********************************
 //* ************************************************************************
 // Servo settings (in degrees)
-int SERVO_HOME_POS = 55;      // Neutral position (reduced by 25°)
-int SERVO_PICKUP_POS = 55;    // Pickup orientation (reduced by 25°)
-int SERVO_TRAVEL_POS = 35;     // Travel position (reduced by 25°)
-int SERVO_DROPOFF_POS = 175;   // Dropoff orientation (reduced by 25°)
+int SERVO_HOME_POS = 40;      // Neutral position (reduced by 40° total)
+int SERVO_PICKUP_POS = 40;    // Pickup orientation (reduced by 40° total)
+int SERVO_TRAVEL_POS = 20;     // Travel position (reduced by 40° total)
+int SERVO_DROPOFF_POS = 140;   // Dropoff orientation (reduced by 40° total)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
