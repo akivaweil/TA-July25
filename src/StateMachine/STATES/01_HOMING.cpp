@@ -7,6 +7,7 @@
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern Bounce xHomeSwitch;
+extern Bounce zHomeSwitch;
 
 //* ************************************************************************
 //* ************************ HOMING STATE **********************************
@@ -16,18 +17,20 @@ extern Bounce xHomeSwitch;
 
 bool handleHoming() {
   static int homingStep = 0;
+  static unsigned long zHomingStartTime = 0;
   
   switch(homingStep) {
     case 0:  // Start Z homing
       if (zStepper) {
         zStepper->setSpeedInHz(Z_HOME_SPEED);
         zStepper->move(-50000);  // Move negative direction
+        zHomingStartTime = millis();  // Record start time for timeout
       }
       homingStep = 1;
       break;
       
-    case 1:  // Wait for Z home switch
-      if (digitalRead(Z_HOME_SWITCH_PIN) == LOW) {
+    case 1:  // Wait for Z home switch or timeout
+      if (zHomeSwitch.read() == HIGH || (millis() - zHomingStartTime) >= 5000) {
         if (zStepper) {
           zStepper->forceStop();
           zStepper->setCurrentPosition(Z_HOME_POS);
