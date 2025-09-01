@@ -27,7 +27,7 @@ bool handleHoming() {
       break;
       
     case 1:  // Wait for Z home switch
-      if (digitalRead(Z_HOME_SWITCH_PIN) == HIGH) {
+      if (digitalRead(Z_HOME_SWITCH_PIN) == LOW) {
         if (zStepper) {
           zStepper->forceStop();
           zStepper->setCurrentPosition(Z_HOME_POS);

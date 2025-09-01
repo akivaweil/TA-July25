@@ -23,7 +23,7 @@ float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
 float Z_PICKUP_LOWER_INCHES = 6.3;     // Lower Z by 6.3" for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 6.0;    // Lower Z by 6.0" for dropoff
+float Z_DROPOFF_LOWER_INCHES = 6.1;    // Lower Z by 6.1" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 
 //* ************************************************************************

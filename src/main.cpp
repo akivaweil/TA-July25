@@ -80,7 +80,7 @@ void setupPins() {
   pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
   pinMode(STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
   pinMode(X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
-  pinMode(Z_HOME_SWITCH_PIN, INPUT);  // Z-axis: direct high reading, no pull-down
+  pinMode(Z_HOME_SWITCH_PIN, INPUT_PULLUP);  // Z-axis: active low with pullup
   pinMode(STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
   
   // Output pins
