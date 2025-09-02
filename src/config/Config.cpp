@@ -23,6 +23,8 @@ float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
 float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z 0.3" away from home after homing
+float X_RETURN_HOME_INCHES = 0.25;     // Move X 0.25" away from home at end of cycle
+float Z_RETURN_HOME_INCHES = 0.25;     // Move Z 0.25" away from home at end of cycle
 float Z_PICKUP_LOWER_INCHES = 6.5;     // Lower Z by 6.5" for pickup (updated from original)
 float Z_DROPOFF_LOWER_INCHES = 6.1;    // Lower Z by 6.1" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
@@ -32,7 +34,9 @@ float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 //* ************************************************************************
 // Converted positions (in steps)
 int X_HOME_POS = 0;
-int Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH); // Z position 0.2" away from physical home (new zero)
+int Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH); // Z position 0.3" away from physical home (new zero)
+int X_RETURN_HOME_POS = (int)(X_RETURN_HOME_INCHES * STEPS_PER_INCH); // X position 0.25" away from home
+int Z_RETURN_HOME_POS = (int)(Z_RETURN_HOME_INCHES * STEPS_PER_INCH); // Z position 0.25" away from home
 int X_PICKUP_POS = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
 int X_DROPOFF_POS = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH); 
 int X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);

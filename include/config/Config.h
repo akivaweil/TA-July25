@@ -24,6 +24,8 @@ extern float X_DROPOFF_INCHES;    // X dropoff position
 extern float X_OVERSHOOT_INCHES;  // X overshoot position for servo rotation
 
 extern float Z_HOME_OFFSET_INCHES;      // Move Z away from home after homing
+extern float X_RETURN_HOME_INCHES;      // Move X away from home at end of cycle
+extern float Z_RETURN_HOME_INCHES;      // Move Z away from home at end of cycle
 extern float Z_PICKUP_LOWER_INCHES;     // Lower Z for pickup
 extern float Z_DROPOFF_LOWER_INCHES;    // Lower Z for dropoff
 extern float Z_SUCTION_START_INCHES;    // Start suction when this far down
@@ -34,6 +36,8 @@ extern float Z_SUCTION_START_INCHES;    // Start suction when this far down
 // Converted positions (in steps)
 extern int X_HOME_POS;
 extern int Z_HOME_POS;
+extern int X_RETURN_HOME_POS;  // X position 0.25" away from home
+extern int Z_RETURN_HOME_POS;  // Z position 0.25" away from home
 extern int X_PICKUP_POS;
 extern int X_DROPOFF_POS;
 extern int X_OVERSHOOT_POS;
