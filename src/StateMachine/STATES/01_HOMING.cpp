@@ -33,9 +33,9 @@ bool handleHoming() {
       if (zHomeSwitch.read() == HIGH || (millis() - zHomingStartTime) >= 5000) {
         if (zStepper) {
           zStepper->forceStop();
-          zStepper->setCurrentPosition(Z_HOME_POS);
+          zStepper->setCurrentPosition(0);  // Set physical home as position 0
           zStepper->setSpeedInHz(Z_MAX_SPEED);
-          zStepper->moveTo(Z_UP_POS);  // Move to new zero position (0.2" from physical home)
+          zStepper->moveTo(Z_HOME_POS);  // Move to offset position (1.0" from physical home)
         }
         homingStep = 2;
       }
