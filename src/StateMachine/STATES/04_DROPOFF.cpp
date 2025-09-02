@@ -52,7 +52,7 @@ bool handleDropoff() {
         
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
-          zStepper->moveTo(Z_UP_POS);
+          zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
         }
         dropoffState = DROPOFF_RAISE_Z;
       }

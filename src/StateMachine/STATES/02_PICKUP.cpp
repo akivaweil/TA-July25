@@ -44,7 +44,7 @@ bool handlePickup() {
     case PICKUP_WAIT:
       if (waitForTime(PICKUP_HOLD_TIME)) {
         if (zStepper) {
-          zStepper->moveTo(Z_UP_POS);
+          zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
         }
         pickupState = PICKUP_RAISE_Z;
       }
