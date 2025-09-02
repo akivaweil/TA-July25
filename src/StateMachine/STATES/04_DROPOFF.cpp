@@ -77,17 +77,17 @@ bool handleDropoff() {
       //! Wait for both Z to reach full up position and X to reach home
       //! ************************************************************************
       if (isMotorAtTarget(zStepper) && isMotorAtTarget(xStepper)) {
-        // Both motors at target, reset servo and move X to pickup position
+        // Both motors at target, reset servo and move X to return home position
         swivelArmServo.write(SERVO_HOME_POS);    // Reset servo to home position
         if (xStepper) {
-          xStepper->moveTo(X_PICKUP_POS);
+          xStepper->moveTo(X_RETURN_HOME_POS);  // Move X to 0.25" away from home
         }
         dropoffState = DROPOFF_DONE;
       }
       break;
       
     case DROPOFF_DONE:
-      // Wait for X to reach pickup position
+      // Wait for X to reach return home position
       if (isMotorAtTarget(xStepper)) {
         digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
         dropoffState = DROPOFF_LOWER_Z;  // Reset for next cycle
