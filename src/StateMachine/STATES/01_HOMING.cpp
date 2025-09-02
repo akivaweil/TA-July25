@@ -35,7 +35,7 @@ bool handleHoming() {
           zStepper->forceStop();
           zStepper->setCurrentPosition(Z_HOME_POS);
           zStepper->setSpeedInHz(Z_MAX_SPEED);
-          zStepper->moveTo(Z_UP_POS);  // Move up 5 inches
+          zStepper->moveTo(Z_HOME_OFFSET_POS);  // Move 0.2" away from home
         }
         homingStep = 2;
       }

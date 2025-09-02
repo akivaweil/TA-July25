@@ -23,6 +23,7 @@ extern float X_PICKUP_INCHES;     // X pickup position
 extern float X_DROPOFF_INCHES;    // X dropoff position
 extern float X_OVERSHOOT_INCHES;  // X overshoot position for servo rotation
 
+extern float Z_HOME_OFFSET_INCHES;      // Move Z away from home after homing
 extern float Z_PICKUP_LOWER_INCHES;     // Lower Z for pickup
 extern float Z_DROPOFF_LOWER_INCHES;    // Lower Z for dropoff
 extern float Z_SUCTION_START_INCHES;    // Start suction when this far down
@@ -39,6 +40,7 @@ extern int X_OVERSHOOT_POS;
 
 // Z-axis positions (original coordinate system: Z_UP = 0, positive = down)
 extern int Z_UP_POS;     // Z-axis fully up position
+extern int Z_HOME_OFFSET_POS; // Z position away from home after homing
 extern int Z_PICKUP_POS;     // Z down for pickup
 extern int Z_DROPOFF_POS;   // Z down for dropoff
 extern int Z_SUCTION_START_POS; // Z position to start suction

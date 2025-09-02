@@ -22,6 +22,7 @@ float X_PICKUP_INCHES = 0.5;     // X pickup position
 float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 1.75);  // 1.75" past dropoff for servo rotation
 
+float Z_HOME_OFFSET_INCHES = 0.2;      // Move Z 0.2" away from home after homing
 float Z_PICKUP_LOWER_INCHES = 6.2;     // Lower Z by 6.2" for pickup (updated from original)
 float Z_DROPOFF_LOWER_INCHES = 6.1;    // Lower Z by 6.1" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
@@ -38,6 +39,7 @@ int X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);
 
 // Z-axis positions (original coordinate system: Z_UP = 0, positive = down)
 int Z_UP_POS = 0;     // Z-axis fully up position
+int Z_HOME_OFFSET_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH); // Z position 0.2" away from home
 int Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);     // Z down for pickup
 int Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);   // Z down for dropoff
 int Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH); // Z position to start suction
