@@ -184,7 +184,7 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        systemState = STATE_IDLE;  // Skip RETURN_HOME, handled in dropoff
+        systemState = STATE_HOMING;  // Perform full homing sequence after each cycle
       }
       break;
       
