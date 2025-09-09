@@ -50,6 +50,7 @@ DropoffState dropoffState = DROPOFF_LOWER_Z;
 // Timing variables
 unsigned long stateTimer = 0;
 bool vacuumActive = false;
+bool isInitialHoming = true;  // Start with initial homing flag set
 
 //* ************************************************************************
 //* ************************ SETUP FUNCTION ********************************
@@ -98,7 +99,7 @@ void setupPins() {
 void setupDebouncers() {
   // Configure limit switches with 2ms debounce (same as Transfer-Arm_TA-June25)
   xHomeSwitch.attach(X_HOME_SWITCH_PIN);
-  xHomeSwitch.interval(2);  // 2ms debounce
+  xHomeSwitch.interval(0);  // 2ms debounce
   
   // Z-axis: 3ms debounce for reliable homing
   zHomeSwitch.attach(Z_HOME_SWITCH_PIN);

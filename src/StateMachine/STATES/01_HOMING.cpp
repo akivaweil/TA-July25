@@ -22,7 +22,9 @@ bool handleHoming() {
   switch(homingStep) {
     case 0:  // Start Z homing
       if (zStepper) {
-        zStepper->setSpeedInHz(Z_HOME_SPEED);
+        // Use initial homing speed if this is the first homing, otherwise use normal speed
+        int zSpeed = isInitialHoming ? Z_INITIAL_HOME_SPEED : Z_HOME_SPEED;
+        zStepper->setSpeedInHz(zSpeed);
         zStepper->move(-50000);  // Move negative direction
         zHomingStartTime = millis();  // Record start time for timeout
       }
@@ -44,7 +46,9 @@ bool handleHoming() {
     case 2:  // Wait for Z to reach up position
       if (isMotorAtTarget(zStepper)) {
         if (xStepper) {
-          xStepper->setSpeedInHz(X_HOME_SPEED);
+          // Use initial homing speed if this is the first homing, otherwise use normal speed
+          int xSpeed = isInitialHoming ? X_INITIAL_HOME_SPEED : X_HOME_SPEED;
+          xStepper->setSpeedInHz(xSpeed);
           xStepper->move(-50000);  // Move negative direction
         }
         homingStep = 3;
@@ -65,6 +69,7 @@ bool handleHoming() {
       
     case 4:  // Wait for X to reach pickup
       if (isMotorAtTarget(xStepper)) {
+        isInitialHoming = false;  // Clear initial homing flag after first homing
         homingStep = 0;   // Reset for next homing
         return true;      // Homing complete
       }

@@ -79,10 +79,12 @@ extern float Z_EARLY_RETURN_INCHES;  // Z distance to travel up before starting 
 extern int X_MAX_SPEED;  // Steps per second
 extern int X_ACCELERATION; // Steps per second^2
 extern int X_HOME_SPEED;    // Homing speed
+extern int X_INITIAL_HOME_SPEED;  // Initial homing speed (2x faster)
 
 extern int Z_MAX_SPEED; // Steps per second
 extern int Z_ACCELERATION; // Steps per second^2
 extern int Z_HOME_SPEED;    // Homing speed
+extern int Z_INITIAL_HOME_SPEED;  // Initial homing speed (2x faster)
 extern int Z_DROPOFF_SPEED; // Dropoff speed
 
 #endif 
