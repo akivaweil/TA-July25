@@ -22,9 +22,8 @@ bool handleHoming() {
   switch(homingStep) {
     case 0:  // Start Z homing
       if (zStepper) {
-        // Use initial homing speed if this is the first homing, otherwise use normal speed
-        int zSpeed = isInitialHoming ? Z_INITIAL_HOME_SPEED : Z_HOME_SPEED;
-        zStepper->setSpeedInHz(zSpeed);
+        // Z-axis always uses same speed for initial and subsequent homing
+        zStepper->setSpeedInHz(Z_HOME_SPEED);
         zStepper->move(-50000);  // Move negative direction
         zHomingStartTime = millis();  // Record start time for timeout
       }

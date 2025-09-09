@@ -19,7 +19,7 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************************************************************
 // Position settings (in inches from home)
 float X_PICKUP_INCHES = 0.3;     // X pickup position
-float X_DROPOFF_INCHES = 20.2;  // X dropoff position (updated from original)
+float X_DROPOFF_INCHES = 20.05;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.0);  // 2.0" past dropoff for servo rotation
 
 float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z 0.3" away from home after homing
@@ -55,7 +55,7 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 int SERVO_HOME_POS = 15;      // Neutral position (reduced by 40° total)
 int SERVO_PICKUP_POS = 15;    // Pickup orientation (reduced by 40° total)
 int SERVO_TRAVEL_POS = 0;     // Travel position (reduced by 40° total)
-int SERVO_DROPOFF_POS = 106;   // Dropoff orientation (reduced by 40° total)
+int SERVO_DROPOFF_POS = 107;   // Dropoff orientation (reduced by 40° total)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
@@ -83,5 +83,4 @@ int X_INITIAL_HOME_SPEED = 1600;  // Initial homing speed (2x faster)
 int Z_MAX_SPEED = 10000; // Steps per second
 int Z_ACCELERATION = 10000; // Steps per second^2
 int Z_HOME_SPEED = 600;     // Homing speed (doubled)
-int Z_INITIAL_HOME_SPEED = 1200;  // Initial homing speed (2x faster)
 int Z_DROPOFF_SPEED = 10000; // Same speed as normal for dropoff 
