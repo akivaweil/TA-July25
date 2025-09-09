@@ -69,7 +69,6 @@ extern TransportState transportState;
 extern DropoffState dropoffState;
 
 extern bool vacuumActive;
-extern bool isInitialHoming;  // Track if this is the first homing after startup
 
 //* ************************************************************************
 //* ************************ FUNCTION DECLARATIONS *************************

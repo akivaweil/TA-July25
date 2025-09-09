@@ -19,13 +19,13 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************************************************************
 // Position settings (in inches from home)
 float X_PICKUP_INCHES = 0.3;     // X pickup position
-float X_DROPOFF_INCHES = 20.05;  // X dropoff position (updated from original)
+float X_DROPOFF_INCHES = 19.9;  // X dropoff position (updated from original)
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.0);  // 2.0" past dropoff for servo rotation
 
 float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z 0.3" away from home after homing
 float X_RETURN_HOME_INCHES = 0.25;     // Move X 0.25" away from home at end of cycle
 float Z_RETURN_HOME_INCHES = 0.25;     // Move Z 0.25" away from home at end of cycle
-float Z_PICKUP_LOWER_INCHES = 6.4;     // Lower Z by 6.5" for pickup (updated from original)
+float Z_PICKUP_LOWER_INCHES = 6.45;     // Lower Z by 6.5" for pickup (updated from original)
 float Z_DROPOFF_LOWER_INCHES = 6.1;    // Lower Z by 6.1" for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
 
@@ -78,7 +78,6 @@ float Z_EARLY_RETURN_INCHES = 2.0;  // Z distance to travel up before starting X
 int X_MAX_SPEED = 10000;  // Steps per second
 int X_ACCELERATION = 13000; // Steps per second^2
 int X_HOME_SPEED = 800;   // Homing speed (doubled)
-int X_INITIAL_HOME_SPEED = 1600;  // Initial homing speed (2x faster)
 
 int Z_MAX_SPEED = 10000; // Steps per second
 int Z_ACCELERATION = 10000; // Steps per second^2

@@ -50,7 +50,6 @@ DropoffState dropoffState = DROPOFF_LOWER_Z;
 // Timing variables
 unsigned long stateTimer = 0;
 bool vacuumActive = false;
-bool isInitialHoming = true;  // Start with initial homing flag set
 
 //* ************************************************************************
 //* ************************ SETUP FUNCTION ********************************
