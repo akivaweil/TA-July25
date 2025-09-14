@@ -19,30 +19,30 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************************************************************
 // Position settings (in inches from home)
 float X_PICKUP_INCHES = 0.3;     // X pickup position
-float X_DROPOFF_INCHES = 19.9;  // X dropoff position (updated from original)
-float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.0);  // 2.0" past dropoff for servo rotation
+float X_DROPOFF_INCHES = 20.5;  // X dropoff position (updated from original)
+float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);  // 2.0" past dropoff for servo rotation
 
-float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z 0.3" away from home after homing
-float X_RETURN_HOME_INCHES = 0.25;     // Move X 0.25" away from home at end of cycle
-float Z_RETURN_HOME_INCHES = 0.25;     // Move Z 0.25" away from home at end of cycle
-float Z_PICKUP_LOWER_INCHES = 6.45;     // Lower Z by 6.5" for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 6.1;    // Lower Z by 6.1" for dropoff
-float Z_SUCTION_START_INCHES = 4.0;    // Start suction when 4" down
+float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
+float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
+float Z_RETURN_HOME_INCHES = 0.25;     // Move Z away from home at end of cycle
+float Z_PICKUP_LOWER_INCHES = 6.45;     // Lower Z for pickup (updated from original)
+float Z_DROPOFF_LOWER_INCHES = 6.6;    // Lower Z for dropoff
+float Z_SUCTION_START_INCHES = 4.0;    // Start suction when down
 
 //* ************************************************************************
 //* ************************ CONVERTED POSITIONS ***************************
 //* ************************************************************************
 // Converted positions (in steps)
 int X_HOME_POS = 0;
-int Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH); // Z position 0.3" away from physical home (new zero)
-int X_RETURN_HOME_POS = (int)(X_RETURN_HOME_INCHES * STEPS_PER_INCH); // X position 0.25" away from home
-int Z_RETURN_HOME_POS = (int)(Z_RETURN_HOME_INCHES * STEPS_PER_INCH); // Z position 0.25" away from home
+int Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH); // Z position away from physical home (new zero)
+int X_RETURN_HOME_POS = (int)(X_RETURN_HOME_INCHES * STEPS_PER_INCH); // X position away from home
+int Z_RETURN_HOME_POS = (int)(Z_RETURN_HOME_INCHES * STEPS_PER_INCH); // Z position away from home
 int X_PICKUP_POS = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
 int X_DROPOFF_POS = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH); 
 int X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);
 
 // Z-axis positions (coordinate system: 0.2" from physical home = 0, positive = down)
-int Z_UP_POS = 0;     // Z-axis at offset position (0.2" from physical home)
+int Z_UP_POS = 0;     // Z-axis at offset position from physical home
 int Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);     // Z down for pickup
 int Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);   // Z down for dropoff
 int Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH); // Z position to start suction
@@ -52,10 +52,10 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 //* ************************ SERVO SETTINGS ********************************
 //* ************************************************************************
 // Servo settings (in degrees)
-int SERVO_HOME_POS = 15;      // Neutral position (reduced by 40° total)
-int SERVO_PICKUP_POS = 15;    // Pickup orientation (reduced by 40° total)
-int SERVO_TRAVEL_POS = 0;     // Travel position (reduced by 40° total)
-int SERVO_DROPOFF_POS = 107;   // Dropoff orientation (reduced by 40° total)
+int SERVO_HOME_POS = 52;      // Neutral position (reduced by 40° total)
+int SERVO_PICKUP_POS = 52;    // Pickup orientation (reduced by 40° total)
+int SERVO_TRAVEL_POS = 32;     // Travel position (reduced by 40° total)
+int SERVO_DROPOFF_POS = 117;   // Dropoff orientation (reduced by 40° total)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
