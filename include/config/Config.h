@@ -63,6 +63,7 @@ extern int SERVO_DROPOFF_POS;   // Dropoff orientation
 //* ************************ TIMING SETTINGS *******************************
 //* ************************************************************************
 // Timing settings (in milliseconds)
+extern int START_SIGNAL_DELAY;   // Delay after start signal before beginning pick cycle
 extern int PICKUP_HOLD_TIME;     // Hold time at pickup position
 extern int DROPOFF_HOLD_TIME;    // Hold time at dropoff position
 extern int SERVO_ROTATION_TIME;  // Wait time for servo rotation

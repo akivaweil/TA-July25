@@ -18,15 +18,15 @@ float STEPS_PER_INCH = (STEPS_PER_MM * 25.4);
 //* ************************ POSITION SETTINGS *****************************
 //* ************************************************************************
 // Position settings (in inches from home)
-float X_PICKUP_INCHES = 0.3;     // X pickup position
-float X_DROPOFF_INCHES = 20.5;  // X dropoff position (updated from original)
+float X_PICKUP_INCHES = 0.2;     // X pickup position
+float X_DROPOFF_INCHES = 20.5;  // X dropoff position
 float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);  // 2.0" past dropoff for servo rotation
 
 float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
 float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
 float Z_RETURN_HOME_INCHES = 0.25;     // Move Z away from home at end of cycle
 float Z_PICKUP_LOWER_INCHES = 6.45;     // Lower Z for pickup (updated from original)
-float Z_DROPOFF_LOWER_INCHES = 6.6;    // Lower Z for dropoff
+float Z_DROPOFF_LOWER_INCHES = 6.5;    // Lower Z for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when down
 
 //* ************************************************************************
@@ -55,12 +55,13 @@ int Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH); // Z pos
 int SERVO_HOME_POS = 52;      // Neutral position (reduced by 40° total)
 int SERVO_PICKUP_POS = 52;    // Pickup orientation (reduced by 40° total)
 int SERVO_TRAVEL_POS = 32;     // Travel position (reduced by 40° total)
-int SERVO_DROPOFF_POS = 117;   // Dropoff orientation (reduced by 40° total)
+int SERVO_DROPOFF_POS = 116;   // Dropoff orientation (reduced by 40° total)
 
 //* ************************************************************************
 //* ************************ TIMING SETTINGS *******************************
 //* ************************************************************************
 // Timing settings (in milliseconds)  
+int START_SIGNAL_DELAY = 150;   // Delay after start signal before beginning pick cycle
 int PICKUP_HOLD_TIME = 300;     // Hold time at pickup position
 int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
