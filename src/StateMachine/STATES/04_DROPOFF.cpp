@@ -63,10 +63,10 @@ bool handleDropoff() {
       //! Check if Z has moved up enough to start X return home
       //! ************************************************************************
       if (zStepper && zStepper->getCurrentPosition() <= Z_EARLY_RETURN_POS) {
-        // Z has moved up 2 inches, start X return home
+        // Z has moved up 2 inches, start X return home to 0.25" from home
         digitalWrite(STAGE2_SIGNAL_PIN, HIGH);  // Signal Stage 2
         if (xStepper) {
-          xStepper->moveTo(X_HOME_POS);  // Start X return home
+          xStepper->moveTo(X_RETURN_HOME_POS);  // Move X to 0.25" away from home
         }
         dropoffState = DROPOFF_EARLY_RETURN;
       }
@@ -74,14 +74,11 @@ bool handleDropoff() {
       
     case DROPOFF_EARLY_RETURN:
       //! ************************************************************************
-      //! Wait for both Z to reach full up position and X to reach home
+      //! Wait for both Z to reach full up position and X to reach return home position
       //! ************************************************************************
       if (isMotorAtTarget(zStepper) && isMotorAtTarget(xStepper)) {
-        // Both motors at target, reset servo and move X to return home position
+        // Both motors at target, reset servo
         swivelArmServo.write(SERVO_HOME_POS);    // Reset servo to home position
-        if (xStepper) {
-          xStepper->moveTo(X_RETURN_HOME_POS);  // Move X to 0.25" away from home
-        }
         dropoffState = DROPOFF_DONE;
       }
       break;
