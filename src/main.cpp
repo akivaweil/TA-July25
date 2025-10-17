@@ -184,7 +184,7 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        systemState = STATE_RETURN_HOME;  // Return to 0.25" from home without re-homing
+        systemState = STATE_HOMING;  // Home using switches, then move to pickup
       }
       break;
       
