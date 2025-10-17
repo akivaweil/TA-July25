@@ -76,11 +76,11 @@ float Z_EARLY_RETURN_INCHES = 2.0;  // Z distance to travel up before starting X
 //* ************************ STEPPER MOTOR SETTINGS ***********************
 //* ************************************************************************
 // Stepper motor settings (updated from original)
-int X_MAX_SPEED = 10000;  // Steps per second
-int X_ACCELERATION = 13000; // Steps per second^2
+int X_MAX_SPEED = 15000;  // Steps per second
+int X_ACCELERATION = 20000; // Steps per second^2
 int X_HOME_SPEED = 800;   // Homing speed (doubled)
 
-int Z_MAX_SPEED = 10000; // Steps per second
-int Z_ACCELERATION = 10000; // Steps per second^2
+int Z_MAX_SPEED = 15000; // Steps per second
+int Z_ACCELERATION = 15000; // Steps per second^2
 int Z_HOME_SPEED = 600;     // Homing speed (doubled)
-int Z_DROPOFF_SPEED = 10000; // Same speed as normal for dropoff 
+int Z_DROPOFF_SPEED = 15000; // Same speed as normal for dropoff 
