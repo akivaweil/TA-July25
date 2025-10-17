@@ -184,7 +184,7 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        systemState = STATE_HOMING;  // Perform full homing sequence after each cycle
+        systemState = STATE_RETURN_HOME;  // Return to 0.25" from home without re-homing
       }
       break;
       
