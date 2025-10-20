@@ -61,7 +61,7 @@ int SERVO_DROPOFF_POS = 116;   // Dropoff orientation (reduced by 40° total)
 //* ************************ TIMING SETTINGS *******************************
 //* ************************************************************************
 // Timing settings (in milliseconds)  
-int START_SIGNAL_DELAY = 150;   // Delay after start signal before beginning pick cycle
+int START_SIGNAL_DELAY = 225;   // Delay after start signal before beginning pick cycle
 int PICKUP_HOLD_TIME = 300;     // Hold time at pickup position
 int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
