@@ -197,6 +197,9 @@ void loop() {
   
   // Handle serial commands
   handleSerial();
+  
+  // Yield to other tasks to reduce CPU load
+  delay(1);
 } 
 
 //* ************************************************************************
