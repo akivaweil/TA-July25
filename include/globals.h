@@ -37,6 +37,7 @@ enum SystemState {
 
 enum PickupState {
   PICKUP_MOVE_X,
+  PICKUP_WAIT_X,
   PICKUP_LOWER_Z,
   PICKUP_WAIT,
   PICKUP_RAISE_Z,

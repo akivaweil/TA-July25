@@ -21,10 +21,14 @@ bool handlePickup() {
     case PICKUP_MOVE_X:
       if (xStepper) {
         xStepper->moveTo(X_PICKUP_POS);
-        if (isMotorAtTarget(xStepper)) {
-          swivelArmServo.write(SERVO_PICKUP_POS);
-          pickupState = PICKUP_LOWER_Z;
-        }
+        pickupState = PICKUP_WAIT_X;
+      }
+      break;
+      
+    case PICKUP_WAIT_X:
+      if (isMotorAtTarget(xStepper)) {
+        swivelArmServo.write(SERVO_PICKUP_POS);
+        pickupState = PICKUP_LOWER_Z;
       }
       break;
       
