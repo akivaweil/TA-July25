@@ -20,8 +20,8 @@ bool handleTransport() {
       swivelArmServo.write(SERVO_TRAVEL_POS);
       if (xStepper) {
         xStepper->moveTo(X_OVERSHOOT_POS);
-        transportState = TRANSPORT_MOVE_TO_OVERSHOOT;
       }
+      transportState = TRANSPORT_MOVE_TO_OVERSHOOT;
       break;
       
     case TRANSPORT_MOVE_TO_OVERSHOOT:

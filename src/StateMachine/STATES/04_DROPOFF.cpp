@@ -35,8 +35,14 @@ bool handleDropoff() {
         // Additional verification: ensure we're actually at the dropoff position
         if (zStepper && abs(zStepper->getCurrentPosition() - Z_DROPOFF_POS) <= 10) {
           deactivateVacuum();
-          dropoffState = DROPOFF_RELEASE;
+          dropoffState = DROPOFF_VACUUM_DELAY;
         }
+      }
+      break;
+      
+    case DROPOFF_VACUUM_DELAY:
+      if (waitForTime(300)) {
+        dropoffState = DROPOFF_RELEASE;
       }
       break;
       
@@ -46,6 +52,12 @@ bool handleDropoff() {
       
     case DROPOFF_WAIT:
       if (waitForTime(DROPOFF_HOLD_TIME)) {
+        dropoffState = DROPOFF_SETTLE;
+      }
+      break;
+      
+    case DROPOFF_SETTLE:
+      if (waitForTime(100)) {
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
           zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
