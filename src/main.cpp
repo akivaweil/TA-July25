@@ -141,8 +141,10 @@ void setupSteppers() {
 //* ************************ MAIN LOOP - STATE MACHINE ********************
 //* ************************************************************************
 void loop() {
-  // Handle OTA updates
-  handleOTA();
+  // Handle OTA updates only in IDLE state
+  if (systemState == STATE_IDLE) {
+    handleOTA();
+  }
   
   // Update all debouncers first
   xHomeSwitch.update();
