@@ -18,6 +18,10 @@ void setupOTA() {
     ESP.restart();
   }
 
+  // Print IP address on startup
+  Serial.print("Connected to WiFi. IP address: ");
+  Serial.println(WiFi.localIP());
+
   ArduinoOTA.setHostname("stage1-esp32s3");
   
   //! ************************************************************************
