@@ -41,7 +41,7 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_VACUUM_DELAY:
-      if (waitForTime(300)) {
+      if (waitForTime(50)) {
         dropoffState = DROPOFF_RELEASE;
       }
       break;
@@ -57,7 +57,7 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_SETTLE:
-      if (waitForTime(100)) {
+      if (waitForTime(50)) {
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
           zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
