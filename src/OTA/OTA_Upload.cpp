@@ -11,15 +11,27 @@ const char* ssid = "Everwood";
 const char* password = "Everwood-Staff";
 
 void setupOTA() {
+  Serial.println("Connecting to WiFi...");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    delay(5000);
+
+  // Try to connect for up to 30 seconds
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED && attempts < 30) {
+    delay(1000);
+    Serial.print(".");
+    attempts++;
+  }
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("\nWiFi connection failed! Restarting...");
+    delay(2000);
     ESP.restart();
   }
 
   // Print IP address on startup
-  Serial.print("Connected to WiFi. IP address: ");
+  Serial.println("\nConnected to WiFi!");
+  Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
   ArduinoOTA.setHostname("stage1-esp32s3");
