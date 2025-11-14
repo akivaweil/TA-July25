@@ -90,11 +90,14 @@ void setupPins() {
   
   // Output pins
   pinMode(X_ENABLE_PIN, OUTPUT);
+  pinMode(SERVO_PIN, OUTPUT);
   pinMode(SOLENOID_RELAY_PIN, OUTPUT);
   pinMode(STAGE2_SIGNAL_PIN, OUTPUT);
   
   // Initial states
   digitalWrite(X_ENABLE_PIN, LOW);   // Enable X motor for smooth operation
+   // Ensure servo pin starts low before PWM attach
+  digitalWrite(SERVO_PIN, LOW);
   digitalWrite(SOLENOID_RELAY_PIN, LOW);  // Vacuum off
   digitalWrite(STAGE2_SIGNAL_PIN, LOW);   // Stage 2 signal off
 }
