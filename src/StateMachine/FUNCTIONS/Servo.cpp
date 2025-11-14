@@ -12,8 +12,8 @@
 //* ************************ SERVO SETUP ***********************************
 //* ************************************************************************
 void setupServo() {
-  // Initialize servo with PWM channel 0
-  swivelArmServo.init(SERVO_PIN, 0);
+  // Initialize servo with PWM channel 7 (highest available LEDC channel)
+  swivelArmServo.init(SERVO_PIN, 7);
   // Set servo to home position
   swivelArmServo.write(SERVO_HOME_POS);
   // Note: Removed blocking delay for smooth stepper operation
