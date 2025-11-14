@@ -145,8 +145,8 @@ void setupSteppers() {
 //* ************************ MAIN LOOP - STATE MACHINE ********************
 //* ************************************************************************
 void loop() {
-  // Handle OTA updates only in IDLE state
-  if (systemState == STATE_IDLE) {
+  // Handle OTA updates in IDLE and HOMING states (to allow OTA even during homing)
+  if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
     handleOTA();
   }
 
