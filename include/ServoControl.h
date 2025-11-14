@@ -1,15 +1,17 @@
 #ifndef SERVO_CONTROL_H
 #define SERVO_CONTROL_H
 
-#include <ESP32Servo.h>
+#include <Arduino.h>
 
 class ServoControl {
 private:
-    Servo servo;
+    int servoPin;
+    int channel;
     int minPulseWidth;
     int maxPulseWidth;
     int minAngle;
     int maxAngle;
+    bool initialized;
 
 public:
     ServoControl();

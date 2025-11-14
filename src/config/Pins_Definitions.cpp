@@ -8,7 +8,7 @@
 
 // INPUT PINS (Active HIGH)
 int START_BUTTON_PIN = 48;     // Start button input (active high)
-int STAGE1_SIGNAL_PIN = 44;   // Stage 1 machine signal input (active high)
+int STAGE1_SIGNAL_PIN = 2;   // Stage 1 machine signal input (active high)
 int X_HOME_SWITCH_PIN = 47;   // X-axis home limit switch (active high)
 int Z_HOME_SWITCH_PIN = 41;   // Z-axis home limit switch (active high)
 int STOP_SIGNAL_STAGE_2 = 1; // Stage 2 safety signal (active high, wait for low)
@@ -16,7 +16,7 @@ int STOP_SIGNAL_STAGE_2 = 1; // Stage 2 safety signal (active high, wait for low
 // OUTPUT PINS - STEPPER MOTORS
 int X_STEP_PIN = 8;          // X-axis stepper motor step pin
 int X_DIR_PIN = 3;           // X-axis stepper motor direction pin
-int X_ENABLE_PIN = 0;         // X-axis stepper motor enable pin (active low)
+int X_ENABLE_PIN = 35;         // X-axis stepper motor enable pin (active low)
 int Z_STEP_PIN = 39;          // Z-axis stepper motor step pin
 int Z_DIR_PIN = 38;           // Z-axis stepper motor direction pin
 
