@@ -1,5 +1,7 @@
 #include "ServoControl.h"
 
+#include "soc/soc_caps.h"
+
 //DO NOT CHANGE THIS FILE AT ALL
 
 ServoControl::ServoControl() {
@@ -18,9 +20,28 @@ void ServoControl::init(int servoPin, int pwmChannel, int freq, int res) {
     channel = pwmChannel;
     frequency = freq;
     resolution = res;
-    
-    // Setup PWM channel
-    ledcSetup(channel, frequency, resolution);
+
+#if defined(SOC_LEDC_TIMER_BIT_WIDE_NUM)
+    int maxResolution = SOC_LEDC_TIMER_BIT_WIDE_NUM;
+#else
+    int maxResolution = resolution;
+#endif
+
+    if (resolution > maxResolution) {
+        resolution = maxResolution;
+    }
+
+    int configuredFreq = ledcSetup(channel, frequency, resolution);
+    while (configuredFreq == 0 && resolution > 10) {
+        resolution--;
+        configuredFreq = ledcSetup(channel, frequency, resolution);
+    }
+
+    if (configuredFreq == 0) {
+        channel = -1;
+        return;
+    }
+
     ledcAttachPin(pin, channel);
 }
 
