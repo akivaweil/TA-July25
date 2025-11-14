@@ -145,7 +145,10 @@ void loop() {
   if (systemState == STATE_IDLE) {
     handleOTA();
   }
-  
+
+  // Print IP address periodically for easy reference
+  printIPAddress();
+
   // Update all debouncers first
   xHomeSwitch.update();
   zHomeSwitch.update();  // Z-axis: 3ms debounce

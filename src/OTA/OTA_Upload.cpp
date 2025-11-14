@@ -29,10 +29,15 @@ void setupOTA() {
     ESP.restart();
   }
 
-  // Print IP address on startup
+  // Print IP address on startup with clear banner
   Serial.println("\nConnected to WiFi!");
-  Serial.print("IP address: ");
+  Serial.println("╔══════════════════════════════════════════════════════════════╗");
+  Serial.println("║                     ESP32-S3 IP ADDRESS                     ║");
+  Serial.println("╚══════════════════════════════════════════════════════════════╝");
+  Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
+  Serial.println("^ Use this IP for OTA updates ^");
+  Serial.println();
 
   ArduinoOTA.setHostname("stage1-esp32s3");
   
@@ -76,4 +81,18 @@ void setupOTA() {
 
 void handleOTA() {
   ArduinoOTA.handle();
+}
+
+void printIPAddress() {
+  static unsigned long lastPrint = 0;
+  if (millis() - lastPrint > 30000) { // Print every 30 seconds
+    Serial.println("\n╔══════════════════════════════════════════════════════════════╗");
+    Serial.println("║                     ESP32-S3 IP ADDRESS                     ║");
+    Serial.println("╚══════════════════════════════════════════════════════════════╝");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+    Serial.println("^ Use this IP for OTA updates ^");
+    Serial.println();
+    lastPrint = millis();
+  }
 } 

@@ -98,4 +98,9 @@ void deactivateVacuum();
 void enableXMotor();
 void disableXMotor();
 
+// OTA functions
+void setupOTA();
+void handleOTA();
+void printIPAddress();
+
 #endif 
