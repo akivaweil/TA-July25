@@ -11,13 +11,11 @@ const char* ssid = "Everwood";
 const char* password = "Everwood-Staff";
 
 void setupOTA() {
-  Serial.println("\n╔══════════════════════════════════════════════════════════════╗");
-  Serial.println("║                       ESP32-S3 STARTUP                      ║");
-  Serial.println("╚══════════════════════════════════════════════════════════════╝");
+  Serial.println("\n=== ESP32-S3 STARTUP ===");
   Serial.println("Connecting to WiFi...");
   Serial.print("SSID: ");
   Serial.println(ssid);
-  Serial.println("Attempting connection...");
+  Serial.print("Connecting");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -28,11 +26,8 @@ void setupOTA() {
     delay(1000);
     Serial.print(".");
     attempts++;
-    if (attempts % 5 == 0) {  // Print status every 5 seconds
-      Serial.printf(" (attempt %d/30) ", attempts);
-    }
   }
-  Serial.println(); // New line after dots
+  Serial.println(" done");
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ WiFi connection FAILED after 30 seconds!");
@@ -46,19 +41,12 @@ void setupOTA() {
     ESP.restart();
   }
 
-  // Print IP address on startup with clear banner
-  Serial.println("\n✅ WiFi connected successfully!");
-  Serial.println("╔══════════════════════════════════════════════════════════════╗");
-  Serial.println("║                     ESP32-S3 IP ADDRESS                     ║");
-  Serial.println("╚══════════════════════════════════════════════════════════════╝");
+  // Print IP address on startup
+  Serial.println("\nWiFi connected successfully!");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
-  Serial.print("MAC Address: ");
-  Serial.println(WiFi.macAddress());
-  Serial.println("Signal Strength: " + String(WiFi.RSSI()) + " dBm");
-  Serial.println();
-  Serial.println("🎯 Use the IP address above for OTA updates!");
-  Serial.println("   Example: pio run -e esp32_s3_ota -t upload --upload-port 192.168.1.XXX");
+  Serial.print("OTA ready at: ");
+  Serial.println(WiFi.localIP());
   Serial.println();
 
   ArduinoOTA.setHostname("stage1-esp32s3");
@@ -107,14 +95,9 @@ void handleOTA() {
 
 void printIPAddress() {
   static unsigned long lastPrint = 0;
-  if (millis() - lastPrint > 30000) { // Print every 30 seconds
-    Serial.println("\n╔══════════════════════════════════════════════════════════════╗");
-    Serial.println("║                     ESP32-S3 IP ADDRESS                     ║");
-    Serial.println("╚══════════════════════════════════════════════════════════════╝");
-    Serial.print("IP Address: ");
+  if (millis() - lastPrint > 300000) { // Print every 5 minutes
+    Serial.print("[INFO] IP: ");
     Serial.println(WiFi.localIP());
-    Serial.println("^ Use this IP for OTA updates ^");
-    Serial.println();
     lastPrint = millis();
   }
 } 
