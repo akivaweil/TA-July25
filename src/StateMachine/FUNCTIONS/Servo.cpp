@@ -12,8 +12,8 @@
 //* ************************ SERVO SETUP ***********************************
 //* ************************************************************************
 void setupServo() {
-  // Initialize servo using standard Arduino Servo library (MCPWM on ESP32-S3)
-  swivelArmServo.init(SERVO_PIN);
+  // Initialize servo with PWM channel 0
+  swivelArmServo.init(SERVO_PIN, 0);
   // Set servo to home position
   swivelArmServo.write(SERVO_HOME_POS);
   // Note: Removed blocking delay for smooth stepper operation

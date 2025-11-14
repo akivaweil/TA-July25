@@ -1,73 +1,65 @@
 #include "ServoControl.h"
 
-#define SERVO_FREQUENCY 50        // 50Hz for standard servos
-#define SERVO_RESOLUTION 16       // 16-bit resolution
-#define SERVO_PERIOD_US 20000     // 20ms period in microseconds
+//DO NOT CHANGE THIS FILE AT ALL
 
 ServoControl::ServoControl() {
+    pin = -1;
+    channel = -1;
+    frequency = 50;
+    resolution = 16;
     minPulseWidth = 500;
     maxPulseWidth = 2500;
     minAngle = 0;
     maxAngle = 180;
-    initialized = false;
-    channel = -1;
 }
 
-void ServoControl::init(int servoPin) {
-    this->servoPin = servoPin;
-
-    // Find an available PWM channel (0-15)
-    for (int i = 0; i < 16; i++) {
-        if (!ledcRead(i)) {  // Check if channel is available
-            channel = i;
-            break;
-        }
-    }
-
-    if (channel == -1) {
-        // If no channel available, use channel 0 (might overwrite existing)
-        channel = 0;
-    }
-
-    // Configure PWM
-    ledcSetup(channel, SERVO_FREQUENCY, SERVO_RESOLUTION);
-    ledcAttachPin(servoPin, channel);
-
-    initialized = true;
+void ServoControl::init(int servoPin, int pwmChannel, int freq, int res) {
+    pin = servoPin;
+    channel = pwmChannel;
+    frequency = freq;
+    resolution = res;
+    
+    // Setup PWM channel
+    ledcSetup(channel, frequency, resolution);
+    ledcAttachPin(pin, channel);
 }
 
-void ServoControl::write(float angle) {
-    if (!initialized) return;
-
+int ServoControl::angleToDuty(float angle) {
     // Constrain angle to valid range
     if (angle < minAngle) angle = minAngle;
     if (angle > maxAngle) angle = maxAngle;
+    
+    // Map angle to pulse width in microseconds
+    float pulseWidth = map(angle, minAngle, maxAngle, minPulseWidth, maxPulseWidth);
+    
+    // Convert pulse width to duty cycle
+    // For 16-bit resolution: duty = (pulseWidth / 20000) * 65535
+    int maxDuty = (1 << resolution) - 1;
+    int duty = (pulseWidth / (1000000.0 / frequency)) * maxDuty;
+    
+    return duty;
+}
 
-    // Convert angle to pulse width in microseconds
-    int pulseWidth = map(angle, minAngle, maxAngle, minPulseWidth, maxPulseWidth);
-
-    writeMicroseconds(pulseWidth);
+void ServoControl::write(float angle) {
+    if (channel >= 0) {
+        int duty = angleToDuty(angle);
+        ledcWrite(channel, duty);
+    }
 }
 
 void ServoControl::writeMicroseconds(int microseconds) {
-    if (!initialized) return;
-
-    // Constrain pulse width to valid range
-    if (microseconds < minPulseWidth) microseconds = minPulseWidth;
-    if (microseconds > maxPulseWidth) microseconds = maxPulseWidth;
-
-    // Convert microseconds to duty cycle
-    // Duty cycle = (pulse_width_us / period_us) * max_duty
-    uint32_t maxDuty = (1 << SERVO_RESOLUTION) - 1;
-    uint32_t duty = (microseconds * maxDuty) / SERVO_PERIOD_US;
-
-    ledcWrite(channel, duty);
+    if (channel >= 0) {
+        // Convert microseconds to duty cycle
+        int maxDuty = (1 << resolution) - 1;
+        int duty = (microseconds / (1000000.0 / frequency)) * maxDuty;
+        ledcWrite(channel, duty);
+    }
 }
 
 void ServoControl::detach() {
-    if (initialized && channel >= 0) {
-        ledcDetachPin(servoPin);
-        initialized = false;
+    if (channel >= 0) {
+        ledcDetachPin(pin);
+        channel = -1;
     }
 }
 
@@ -79,4 +71,4 @@ void ServoControl::setPulseWidthRange(int minUs, int maxUs) {
 void ServoControl::setAngleRange(int minDeg, int maxDeg) {
     minAngle = minDeg;
     maxAngle = maxDeg;
-} 
+}
