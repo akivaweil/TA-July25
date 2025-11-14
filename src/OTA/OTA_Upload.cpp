@@ -11,7 +11,14 @@ const char* ssid = "Everwood";
 const char* password = "Everwood-Staff";
 
 void setupOTA() {
+  Serial.println("\n╔══════════════════════════════════════════════════════════════╗");
+  Serial.println("║                       ESP32-S3 STARTUP                      ║");
+  Serial.println("╚══════════════════════════════════════════════════════════════╝");
   Serial.println("Connecting to WiFi...");
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  Serial.println("Attempting connection...");
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
@@ -21,22 +28,37 @@ void setupOTA() {
     delay(1000);
     Serial.print(".");
     attempts++;
+    if (attempts % 5 == 0) {  // Print status every 5 seconds
+      Serial.printf(" (attempt %d/30) ", attempts);
+    }
   }
+  Serial.println(); // New line after dots
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("\nWiFi connection failed! Restarting...");
-    delay(2000);
+    Serial.println("\n❌ WiFi connection FAILED after 30 seconds!");
+    Serial.println("Possible issues:");
+    Serial.println("- Wrong WiFi credentials");
+    Serial.println("- WiFi network not available");
+    Serial.println("- ESP32-S3 not in range of WiFi");
+    Serial.println("- Wrong WiFi channel/frequency");
+    Serial.println("\nRestarting in 3 seconds...");
+    delay(3000);
     ESP.restart();
   }
 
   // Print IP address on startup with clear banner
-  Serial.println("\nConnected to WiFi!");
+  Serial.println("\n✅ WiFi connected successfully!");
   Serial.println("╔══════════════════════════════════════════════════════════════╗");
   Serial.println("║                     ESP32-S3 IP ADDRESS                     ║");
   Serial.println("╚══════════════════════════════════════════════════════════════╝");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
-  Serial.println("^ Use this IP for OTA updates ^");
+  Serial.print("MAC Address: ");
+  Serial.println(WiFi.macAddress());
+  Serial.println("Signal Strength: " + String(WiFi.RSSI()) + " dBm");
+  Serial.println();
+  Serial.println("🎯 Use the IP address above for OTA updates!");
+  Serial.println("   Example: pio run -e esp32_s3_ota -t upload --upload-port 192.168.1.XXX");
   Serial.println();
 
   ArduinoOTA.setHostname("stage1-esp32s3");
