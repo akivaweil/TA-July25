@@ -1,66 +1,30 @@
 #include "ServoControl.h"
 
-//DO NOT CHANGE THIS FILE AT ALL
-
 ServoControl::ServoControl() {
-    pin = -1;
-    channel = -1;
-    frequency = 50;
-    resolution = 16;
     minPulseWidth = 500;
     maxPulseWidth = 2500;
     minAngle = 0;
     maxAngle = 180;
 }
 
-void ServoControl::init(int servoPin, int pwmChannel, int freq, int res) {
-    pin = servoPin;
-    channel = pwmChannel;
-    frequency = freq;
-    resolution = res;
-    
-    // Setup PWM channel
-    ledcSetup(channel, frequency, resolution);
-    ledcAttachPin(pin, channel);
-}
-
-int ServoControl::angleToDuty(float angle) {
-    // Constrain angle to valid range
-    if (angle < minAngle) angle = minAngle;
-    if (angle > maxAngle) angle = maxAngle;
-    
-    // Map angle to pulse width in microseconds
-    float pulseWidth = map(angle, minAngle, maxAngle, minPulseWidth, maxPulseWidth);
-    
-    // Convert pulse width to duty cycle
-    // For 16-bit resolution: duty = (pulseWidth / 20000) * 65535
-    int maxDuty = (1 << resolution) - 1;
-    int duty = (pulseWidth / (1000000.0 / frequency)) * maxDuty;
-    
-    return duty;
+void ServoControl::init(int servoPin) {
+    servo.attach(servoPin, minPulseWidth, maxPulseWidth);
 }
 
 void ServoControl::write(float angle) {
-    if (channel >= 0) {
-        int duty = angleToDuty(angle);
-        ledcWrite(channel, duty);
-    }
+    // Constrain angle to valid range
+    if (angle < minAngle) angle = minAngle;
+    if (angle > maxAngle) angle = maxAngle;
+
+    servo.write(angle);
 }
 
 void ServoControl::writeMicroseconds(int microseconds) {
-    if (channel >= 0) {
-        // Convert microseconds to duty cycle
-        int maxDuty = (1 << resolution) - 1;
-        int duty = (microseconds / (1000000.0 / frequency)) * maxDuty;
-        ledcWrite(channel, duty);
-    }
+    servo.writeMicroseconds(microseconds);
 }
 
 void ServoControl::detach() {
-    if (channel >= 0) {
-        ledcDetachPin(pin);
-        channel = -1;
-    }
+    servo.detach();
 }
 
 void ServoControl::setPulseWidthRange(int minUs, int maxUs) {

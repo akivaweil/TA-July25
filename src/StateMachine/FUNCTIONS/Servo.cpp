@@ -12,8 +12,8 @@
 //* ************************ SERVO SETUP ***********************************
 //* ************************************************************************
 void setupServo() {
-  // Initialize servo with PWM channel 7 (highest available LEDC channel)
-  swivelArmServo.init(SERVO_PIN, 7);
+  // Initialize servo using standard Arduino Servo library (MCPWM on ESP32-S3)
+  swivelArmServo.init(SERVO_PIN);
   // Set servo to home position
   swivelArmServo.write(SERVO_HOME_POS);
   // Note: Removed blocking delay for smooth stepper operation
