@@ -25,7 +25,7 @@ float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);  // 2.0" past dropoff for s
 float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
 float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
 float Z_RETURN_HOME_INCHES = 0.25;     // Move Z away from home at end of cycle
-float Z_PICKUP_LOWER_INCHES = 6.45;     // Lower Z for pickup (updated from original)
+float Z_PICKUP_LOWER_INCHES = 6.3;     // Lower Z for pickup (updated from original)
 float Z_DROPOFF_LOWER_INCHES = 6.5;    // Lower Z for dropoff
 float Z_SUCTION_START_INCHES = 4.0;    // Start suction when down
 
@@ -76,8 +76,8 @@ float Z_EARLY_RETURN_INCHES = 2.0;  // Z distance to travel up before starting X
 //* ************************ STEPPER MOTOR SETTINGS ***********************
 //* ************************************************************************
 // Stepper motor settings (updated from original)
-int X_MAX_SPEED = 15000;  // Steps per second
-int X_ACCELERATION = 20000; // Steps per second^2
+int X_MAX_SPEED = 8000;  // Steps per second
+int X_ACCELERATION = 10000; // Steps per second^2
 int X_HOME_SPEED = 1000;   // Homing speed
 
 int Z_MAX_SPEED = 15000; // Steps per second
