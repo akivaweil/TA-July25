@@ -13,6 +13,8 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 unsigned long systemStartTime = 0;
+unsigned long lastDashboardUpdate = 0;
+const unsigned long DASHBOARD_UPDATE_INTERVAL = 100;  // Update every 100ms
 
 String getSystemStateString() {
   switch (systemState) {
@@ -108,12 +110,13 @@ void setupWebServer() {
     server.addHandler(&ws);
     
     server.begin();
-    Serial.println("Web server and WebSocket started");
 }
 
 void updateDashboardStatus() {
-    if (ws.count() > 0) {
+    unsigned long currentTime = millis();
+    if (ws.count() > 0 && (currentTime - lastDashboardUpdate >= DASHBOARD_UPDATE_INTERVAL)) {
         broadcastSystemStatus();
         broadcastSensorStatus();
+        lastDashboardUpdate = currentTime;
     }
 }
