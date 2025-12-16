@@ -7,6 +7,6 @@
 //* ************************ WEB SERVER FUNCTIONS **************************
 //* ************************************************************************
 void setupWebServer();
+void updateDashboardStatus();
 
 #endif
-

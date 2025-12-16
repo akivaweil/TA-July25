@@ -204,6 +204,9 @@ void loop() {
   // Handle serial commands
   handleSerial();
   
+  // Update dashboard status
+  updateDashboardStatus();
+  
   // Yield to other tasks to reduce CPU load
   delay(1);
 } 
