@@ -416,11 +416,19 @@ const char dashboardHTML[] PROGMEM = R"rawliteral(
                 document.getElementById('currentState').textContent = data.currentState;
                 
                 const now = Date.now();
-                const estimated = lastUptimeMs + (now - lastUptimeUpdateTime);
-                if (lastUptimeMs === 0 || Math.abs(estimated - data.uptime) > 2000) {
+                if (lastUptimeMs === 0) {
+                    // Initial sync - set the base uptime
                     lastUptimeMs = data.uptime;
                     lastUptimeUpdateTime = now;
                     document.getElementById('uptime').textContent = formatUptime(data.uptime);
+                } else {
+                    // Only reset if there's a major discrepancy (> 10 seconds) indicating connection issues
+                    const estimated = lastUptimeMs + (now - lastUptimeUpdateTime);
+                    if (Math.abs(estimated - data.uptime) > 10000) {
+                        lastUptimeMs = data.uptime;
+                        lastUptimeUpdateTime = now;
+                        document.getElementById('uptime').textContent = formatUptime(data.uptime);
+                    }
                 }
             }
             else if (data.type === 'sensor_status') {
