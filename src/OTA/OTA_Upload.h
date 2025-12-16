@@ -9,7 +9,5 @@
 // Function declarations
 void setupOTA();
 void handleOTA();
-void enableWiFi();
-void disableWiFi();
 
 #endif // OTA_UPLOAD_H 

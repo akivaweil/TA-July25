@@ -4,6 +4,7 @@
 #include <Bounce2.h>
 #include "globals.h"
 #include "OTA/OTA_Upload.h"
+#include "WebServer.h"
 
 // Function declarations
 void setupPins();
@@ -55,7 +56,8 @@ bool vacuumActive = false;
 //* ************************ SETUP FUNCTION ********************************
 //* ************************************************************************
 void setup() {
-  // Don't initialize OTA here - will be enabled when entering HOMING/IDLE states
+  // Initialize OTA functionality
+  setupOTA();
   
   // Configure pins
   setupPins();
@@ -68,6 +70,9 @@ void setup() {
   
   // Configure servo
   setupServo();
+
+  // Start Web Server
+  setupWebServer();
   
   systemState = STATE_HOMING;
 }
@@ -140,30 +145,10 @@ void setupSteppers() {
 //* ************************ MAIN LOOP - STATE MACHINE ********************
 //* ************************************************************************
 void loop() {
-  // Handle OTA updates only in HOMING and IDLE states
-  static SystemState lastState = STATE_RETURN_HOME;  // Initialize to non-OTA state
-  static bool wifiInitialized = false;
-  
-  // Enable WiFi when entering HOMING or IDLE states (including on startup)
-  if ((systemState == STATE_HOMING || systemState == STATE_IDLE) && 
-      (!wifiInitialized || (lastState != STATE_HOMING && lastState != STATE_IDLE))) {
-    enableWiFi();
-    wifiInitialized = true;
-  }
-  
-  // Disable WiFi when leaving HOMING or IDLE states
-  if ((lastState == STATE_HOMING || lastState == STATE_IDLE) && 
-      (systemState != STATE_HOMING && systemState != STATE_IDLE)) {
-    disableWiFi();
-    wifiInitialized = false;
-  }
-  
-  // Handle OTA in HOMING and IDLE states
-  if (systemState == STATE_HOMING || systemState == STATE_IDLE) {
+  // Handle OTA updates only in IDLE state
+  if (systemState == STATE_IDLE) {
     handleOTA();
   }
-  
-  lastState = systemState;
   
   // Update all debouncers first
   xHomeSwitch.update();
