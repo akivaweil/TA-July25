@@ -56,6 +56,10 @@ bool vacuumActive = false;
 //* ************************ SETUP FUNCTION ********************************
 //* ************************************************************************
 void setup() {
+  // Initialize Serial communication
+  Serial.begin(115200);
+  delay(100);
+  
   // Initialize OTA functionality
   setupOTA();
   
