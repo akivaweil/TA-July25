@@ -45,7 +45,7 @@ void broadcastSensorStatus() {
     if (ws.count() > 0) {
         JsonDocument doc;
         doc["type"] = "sensor_status";
-        doc["xHome"] = xHomeSwitch.read();
+        doc["xHome"] = digitalRead(X_HOME_SWITCH_PIN);
         doc["zHome"] = zHomeSwitch.read();
         doc["startButton"] = startButton.read();
         doc["stage1Signal"] = stage1Signal.read();

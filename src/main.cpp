@@ -104,9 +104,7 @@ void setupPins() {
 }
 
 void setupDebouncers() {
-  // Configure limit switches with 2ms debounce (same as Transfer-Arm_TA-June25)
-  xHomeSwitch.attach(X_HOME_SWITCH_PIN);
-  xHomeSwitch.interval(0);  // 2ms debounce
+  // X-axis: no debounce - direct read
   
   // Z-axis: 3ms debounce for reliable homing
   zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
@@ -155,7 +153,6 @@ void loop() {
   }
   
   // Update all debouncers first
-  xHomeSwitch.update();
   zHomeSwitch.update();  // Z-axis: 3ms debounce
   startButton.update();
   stage1Signal.update();

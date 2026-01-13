@@ -6,7 +6,6 @@
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
-extern Bounce xHomeSwitch;
 extern Bounce zHomeSwitch;
 
 //* ************************************************************************
@@ -52,7 +51,7 @@ bool handleHoming() {
       break;
       
     case 3:  // Wait for X home switch
-      if (xHomeSwitch.read() == HIGH) {
+      if (digitalRead(X_HOME_SWITCH_PIN) == HIGH) {
         if (xStepper) {
           xStepper->forceStop();
           xStepper->setCurrentPosition(X_HOME_POS);
