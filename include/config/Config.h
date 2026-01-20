@@ -1,89 +1,38 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//* ************************************************************************
-//* ************************* CONFIGURATION *******************************
-//* ************************************************************************
-// Updated to match original Transfer-Arm_TA-June25 project values
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  GLOBAL CONFIGURATION                                               ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Mechanical settings used for step calculations across all states
+// State-specific settings have been moved to their respective state files:
+//   - 00_IDLE.cpp: START_SIGNAL_DELAY
+//   - 01_HOMING.cpp: Z_HOME_OFFSET, homing speeds
+//   - 02_PICKUP.cpp: X_PICKUP, Z_PICKUP, SUCTION, SERVO_PICKUP, PICKUP_HOLD_TIME
+//   - 03_TRANSPORT.cpp: X_DROPOFF, X_OVERSHOOT, SERVO_TRAVEL/DROPOFF, SERVO_ROTATION_TIME
+//   - 04_DROPOFF.cpp: Z_DROPOFF, Z_EARLY_RETURN, DROPOFF_HOLD_TIME, Z_DROPOFF_SPEED
+//   - 05_RETURN_HOME.cpp: X/Z_RETURN_HOME, SERVO_HOME_POS
 
-//* ************************************************************************
-//* ************************ MECHANICAL SETTINGS **************************
-//* ************************************************************************
-extern int STEPS_PER_REV;   // Steps per revolution (1.8° with 1/2 microstepping)
-extern int PULLEY_TEETH;     // Number of teeth on pulleys
-extern float BELT_PITCH;        // GT2 belt pitch in mm
-extern float STEPS_PER_MM;
-extern float STEPS_PER_INCH;
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  MECHANICAL SETTINGS                                                ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+extern int STEPS_PER_REV;      // Steps per revolution
+extern int PULLEY_TEETH;       // Number of teeth on pulleys
+extern float BELT_PITCH;       // GT2 belt pitch in mm
+extern float STEPS_PER_MM;     // Calculated steps per mm
+extern float STEPS_PER_INCH;   // Calculated steps per inch
 
-//* ************************************************************************
-//* ************************ POSITION SETTINGS *****************************
-//* ************************************************************************
-// Position settings (in inches from home)
-extern float X_PICKUP_INCHES;     // X pickup position
-extern float X_DROPOFF_INCHES;    // X dropoff position
-extern float X_OVERSHOOT_INCHES;  // X overshoot position for servo rotation
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  GLOBAL POSITIONS                                                   ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+extern int X_HOME_POS;  // X home position (physical home)
 
-extern float Z_HOME_OFFSET_INCHES;      // Move Z away from home after homing
-extern float X_RETURN_HOME_INCHES;      // Move X away from home at end of cycle
-extern float Z_RETURN_HOME_INCHES;      // Move Z away from home at end of cycle
-extern float Z_PICKUP_LOWER_INCHES;     // Lower Z for pickup
-extern float Z_DROPOFF_LOWER_INCHES;    // Lower Z for dropoff
-extern float Z_SUCTION_START_INCHES;    // Start suction when this far down
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  STEPPER MOTOR SETTINGS (used in main.cpp setup)                    ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+extern int X_MAX_SPEED;        // X max speed (steps/sec)
+extern int X_ACCELERATION;     // X acceleration (steps/sec²)
+extern int Z_MAX_SPEED;        // Z max speed (steps/sec)
+extern int Z_ACCELERATION;     // Z acceleration (steps/sec²)
 
-//* ************************************************************************
-//* ************************ CONVERTED POSITIONS ***************************
-//* ************************************************************************
-// Converted positions (in steps)
-extern int X_HOME_POS;
-extern int Z_HOME_POS;
-extern int X_RETURN_HOME_POS;  // X position 0.25" away from home
-extern int Z_RETURN_HOME_POS;  // Z position 0.25" away from home
-extern int X_PICKUP_POS;
-extern int X_DROPOFF_POS;
-extern int X_OVERSHOOT_POS;
-
-// Z-axis positions (original coordinate system: Z_UP = 0, positive = down)
-extern int Z_UP_POS;     // Z-axis fully up position
-extern int Z_HOME_OFFSET_POS; // Z position away from home after homing
-extern int Z_PICKUP_POS;     // Z down for pickup
-extern int Z_DROPOFF_POS;   // Z down for dropoff
-extern int Z_SUCTION_START_POS; // Z position to start suction
-extern int Z_EARLY_RETURN_POS; // Z position to start X return home
-
-//* ************************************************************************
-//* ************************ SERVO SETTINGS ********************************
-//* ************************************************************************
-// Servo settings (in degrees)
-extern int SERVO_HOME_POS;      // Neutral position
-extern int SERVO_PICKUP_POS;    // Pickup orientation
-extern int SERVO_TRAVEL_POS;     // Travel position
-extern int SERVO_DROPOFF_POS;   // Dropoff orientation
-
-//* ************************************************************************
-//* ************************ TIMING SETTINGS *******************************
-//* ************************************************************************
-// Timing settings (in milliseconds)
-extern int START_SIGNAL_DELAY;   // Delay after start signal before beginning pick cycle
-extern int PICKUP_HOLD_TIME;     // Hold time at pickup position
-extern int DROPOFF_HOLD_TIME;    // Hold time at dropoff position
-extern int SERVO_ROTATION_TIME;  // Wait time for servo rotation
-
-//* ************************************************************************
-//* ************************ DROPOFF SETTINGS ******************************
-//* ************************************************************************
-// Dropoff behavior settings
-extern float Z_EARLY_RETURN_INCHES;  // Z distance to travel up before starting X return home
-
-//* ************************************************************************
-//* ************************ STEPPER MOTOR SETTINGS ***********************
-//* ************************************************************************
-extern int X_MAX_SPEED;  // Steps per second
-extern int X_ACCELERATION; // Steps per second^2
-extern int X_HOME_SPEED;    // Homing speed
-
-extern int Z_MAX_SPEED; // Steps per second
-extern int Z_ACCELERATION; // Steps per second^2
-extern int Z_HOME_SPEED;    // Homing speed
-extern int Z_DROPOFF_SPEED; // Dropoff speed
-
-#endif 
+#endif

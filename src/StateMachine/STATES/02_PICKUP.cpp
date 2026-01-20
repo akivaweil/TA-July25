@@ -9,14 +9,46 @@ extern FastAccelStepper *zStepper;
 extern ServoControl swivelArmServo;
 extern unsigned long stateTimer;
 extern bool vacuumActive;
+extern float STEPS_PER_INCH;
 
-//* ************************************************************************
-//* ************************ PICKUP STATE **********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📦 PICKUP STATE CONFIG                                                 ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Position settings (inches)
+const float X_PICKUP_INCHES = 0.2;           // X pickup position
+const float Z_PICKUP_LOWER_INCHES = 6.35;    // Lower Z for pickup
+const float Z_SUCTION_START_INCHES = 4.0;    // Start suction when this far down
+
+// Servo settings (degrees)
+const int SERVO_PICKUP_POS = 52;    // Pickup orientation
+
+// Timing settings (ms)
+const int PICKUP_HOLD_TIME = 300;   // Hold time at pickup position
+
+// Calculated positions (steps) - initialized at runtime
+int X_PICKUP_POS = 0;
+int Z_PICKUP_POS = 0;
+int Z_SUCTION_START_POS = 0;
+static bool pickupConfigInitialized = false;
+
+// External Z home position from homing state
+extern int Z_HOME_POS;
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📦 PICKUP STATE                                                        ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles the pickup sequence:
 // Move X to pickup position, set servo, lower Z, activate vacuum, wait, raise Z
 
 bool handlePickup() {
+  // Initialize calculated positions on first call
+  if (!pickupConfigInitialized) {
+    X_PICKUP_POS = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
+    Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);
+    Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH);
+    pickupConfigInitialized = true;
+  }
+  
   switch(pickupState) {
     case PICKUP_MOVE_X:
       if (xStepper) {

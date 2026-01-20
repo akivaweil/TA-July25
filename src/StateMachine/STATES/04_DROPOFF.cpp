@@ -9,14 +9,50 @@ extern FastAccelStepper *zStepper;
 extern unsigned long stateTimer;
 extern Bounce stopSignalStage2;
 extern ServoControl swivelArmServo;
+extern float STEPS_PER_INCH;
 
-//* ************************************************************************
-//* ************************ DROPOFF STATE *********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📤 DROPOFF STATE CONFIG                                                ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Position settings (inches)
+const float Z_DROPOFF_LOWER_INCHES = 6.3;    // Lower Z for dropoff
+const float Z_EARLY_RETURN_INCHES = 2.0;     // Z distance to travel up before starting X return home
+const float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
+
+// Timing settings (ms)
+const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
+
+// Speed settings
+const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec)
+
+// Calculated positions (steps) - initialized at runtime
+int Z_DROPOFF_POS = 0;
+int Z_EARLY_RETURN_POS = 0;
+int X_RETURN_HOME_POS = 0;
+static bool dropoffConfigInitialized = false;
+
+// External positions from other states
+extern int Z_HOME_POS;
+extern int Z_MAX_SPEED;
+
+// Servo home position from return home state
+extern int SERVO_HOME_POS;
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📤 DROPOFF STATE                                                       ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles dropping off the object:
 // Check safety signal, lower Z, release vacuum, wait, raise Z with early X return
 
 bool handleDropoff() {
+  // Initialize calculated positions on first call
+  if (!dropoffConfigInitialized) {
+    Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
+    Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH);
+    X_RETURN_HOME_POS = (int)(X_RETURN_HOME_INCHES * STEPS_PER_INCH);
+    dropoffConfigInitialized = true;
+  }
+  
   switch(dropoffState) {
     case DROPOFF_LOWER_Z:
       // Check safety signal before lowering (using debounced input)

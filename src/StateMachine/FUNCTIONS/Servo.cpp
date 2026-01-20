@@ -8,6 +8,9 @@
 
 // ServoControl swivelArmServo; // Definition is in main.cpp
 
+// External reference to SERVO_HOME_POS from return home state
+extern int SERVO_HOME_POS;
+
 //* ************************************************************************
 //* ************************ SERVO SETUP ***********************************
 //* ************************************************************************

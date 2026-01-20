@@ -4,9 +4,14 @@
 // External reference to state timer
 extern unsigned long stateTimer;
 
-//* ************************************************************************
-//* ************************ IDLE STATE ************************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⏸️  IDLE STATE CONFIG                                                  ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+const int START_SIGNAL_DELAY = 325;   // Delay after start signal before beginning pick cycle (ms)
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⏸️  IDLE STATE                                                         ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state waits for trigger signals (start button or stage1 signal)
 // When triggered, waits for START_SIGNAL_DELAY before transitioning to pickup sequence
 

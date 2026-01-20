@@ -8,15 +8,44 @@ extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern Bounce zHomeSwitch;
 
-//* ************************************************************************
-//* ************************ HOMING STATE **********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🏠 HOMING STATE CONFIG                                                 ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Position settings (inches)
+const float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
+
+// Homing speeds (steps/sec)
+const int X_HOME_SPEED = 800;    // X homing speed
+const int Z_HOME_SPEED = 600;    // Z homing speed
+
+// External references from Config.cpp
+extern float STEPS_PER_INCH;
+extern int X_MAX_SPEED;
+extern int Z_MAX_SPEED;
+extern int X_HOME_POS;
+
+// External reference from pickup state
+extern int X_PICKUP_POS;
+
+// Calculated positions (steps) - initialized at runtime
+int Z_HOME_POS = 0;  // Will be calculated on first call
+static bool homingConfigInitialized = false;
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🏠 HOMING STATE                                                        ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state homes both Z and X axes sequentially
 // Z axis homes first, then moves up, then X axis homes and moves to pickup
 
 bool handleHoming() {
   static int homingStep = 0;
   static unsigned long zHomingStartTime = 0;
+  
+  // Initialize calculated positions on first call
+  if (!homingConfigInitialized) {
+    Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH);
+    homingConfigInitialized = true;
+  }
   
   switch(homingStep) {
     case 0:  // Start Z homing

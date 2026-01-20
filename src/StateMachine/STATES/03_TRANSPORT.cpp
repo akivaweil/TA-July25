@@ -7,14 +7,41 @@
 extern FastAccelStepper *xStepper;
 extern ServoControl swivelArmServo;
 extern unsigned long stateTimer;
+extern float STEPS_PER_INCH;
 
-//* ************************************************************************
-//* ************************ TRANSPORT STATE *******************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🚚 TRANSPORT STATE CONFIG                                              ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Position settings (inches)
+const float X_DROPOFF_INCHES = 20.5;                             // X dropoff position
+const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
+
+// Servo settings (degrees)
+const int SERVO_TRAVEL_POS = 32;      // Travel position
+const int SERVO_DROPOFF_POS = 116;    // Dropoff orientation
+
+// Timing settings (ms)
+const int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
+
+// Calculated positions (steps) - initialized at runtime
+int X_DROPOFF_POS = 0;
+int X_OVERSHOOT_POS = 0;
+static bool transportConfigInitialized = false;
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🚚 TRANSPORT STATE                                                     ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles transporting the object from pickup to dropoff:
 // Rotate servo, move to overshoot, rotate servo again, move to dropoff
 
 bool handleTransport() {
+  // Initialize calculated positions on first call
+  if (!transportConfigInitialized) {
+    X_DROPOFF_POS = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH);
+    X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);
+    transportConfigInitialized = true;
+  }
+  
   switch(transportState) {
     case TRANSPORT_ROTATE_SERVO:
       swivelArmServo.write(SERVO_TRAVEL_POS);
