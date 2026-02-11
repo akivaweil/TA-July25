@@ -8,6 +8,7 @@ extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern unsigned long stateTimer;
 extern Bounce stopSignalStage2;
+extern Bounce zHomeSwitch;
 extern ServoControl swivelArmServo;
 extern float STEPS_PER_INCH;
 
@@ -15,7 +16,7 @@ extern float STEPS_PER_INCH;
 //║ 📤 DROPOFF STATE CONFIG                                                ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-const float Z_DROPOFF_LOWER_INCHES = 6.3;    // Lower Z for dropoff
+const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff
 const float Z_EARLY_RETURN_INCHES = 2.0;     // Z distance to travel up before starting X return home
 const float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
 
@@ -24,6 +25,7 @@ const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 
 // Speed settings
 const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec)
+const int Z_HOME_SPEED = 600;         // Z homing speed during X return
 
 // Calculated positions (steps) - initialized at runtime
 int Z_DROPOFF_POS = 0;
@@ -45,6 +47,9 @@ extern int SERVO_HOME_POS;
 // Check safety signal, lower Z, release vacuum, wait, raise Z with early X return
 
 bool handleDropoff() {
+  static bool zHomingOffsetPhase = false;
+  static unsigned long zHomingStartTime = 0;
+
   // Initialize calculated positions on first call
   if (!dropoffConfigInitialized) {
     Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
@@ -96,7 +101,7 @@ bool handleDropoff() {
       if (waitForTime(50)) {
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
-          zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
+          zStepper->moveTo(Z_HOME_POS);  // Move up toward home area
         }
         dropoffState = DROPOFF_RAISE_Z;
       }
@@ -104,25 +109,43 @@ bool handleDropoff() {
       
     case DROPOFF_RAISE_Z:
       //! ************************************************************************
-      //! Check if Z has moved up enough to start X return home
+      //! Z moved up enough - start X return AND Z homing in parallel (X does NOT home)
       //! ************************************************************************
       if (zStepper && zStepper->getCurrentPosition() <= Z_EARLY_RETURN_POS) {
-        // Z has moved up 2 inches, start X return home to 0.25" from home
-        digitalWrite(STAGE2_SIGNAL_PIN, HIGH);  // Signal Stage 2
+        swivelArmServo.write(SERVO_HOME_POS);
+        digitalWrite(STAGE2_SIGNAL_PIN, HIGH);
+        // Start X moving to pickup position (no X homing)
         if (xStepper) {
-          xStepper->moveTo(X_RETURN_HOME_POS);  // Move X to 0.25" away from home
+          xStepper->moveTo(X_RETURN_HOME_POS);
         }
+        // Start Z homing (run to switch) during X move
+        if (zStepper) {
+          zStepper->forceStop();
+          zStepper->setSpeedInHz(Z_HOME_SPEED);
+          zStepper->move(-50000);
+        }
+        zHomingStartTime = millis();
+        zHomingOffsetPhase = false;
         dropoffState = DROPOFF_EARLY_RETURN;
       }
       break;
       
     case DROPOFF_EARLY_RETURN:
       //! ************************************************************************
-      //! Wait for both Z to reach full up position and X to reach return home position
+      //! Z homing: when switch hits, set pos 0 and move to offset; wait for both X and Z
       //! ************************************************************************
-      if (isMotorAtTarget(zStepper) && isMotorAtTarget(xStepper)) {
-        // Both motors at target, reset servo
-        swivelArmServo.write(SERVO_HOME_POS);    // Reset servo to home position
+      if (!zHomingOffsetPhase) {
+        if (zHomeSwitch.read() == HIGH || (millis() - zHomingStartTime) >= 5000) {
+          if (zStepper) {
+            zStepper->forceStop();
+            zStepper->setCurrentPosition(0);
+            zStepper->setSpeedInHz(Z_MAX_SPEED);
+            zStepper->moveTo(Z_HOME_POS);
+          }
+          zHomingOffsetPhase = true;
+        }
+      } else if (isMotorAtTarget(zStepper) && isMotorAtTarget(xStepper)) {
+        zHomingOffsetPhase = false;
         dropoffState = DROPOFF_DONE;
       }
       break;

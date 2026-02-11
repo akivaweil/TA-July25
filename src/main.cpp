@@ -191,7 +191,7 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        systemState = STATE_HOMING;  // Home using switches, then move to pickup
+        systemState = STATE_IDLE;  // TEMP: skip homing, go straight to idle
       }
       break;
       

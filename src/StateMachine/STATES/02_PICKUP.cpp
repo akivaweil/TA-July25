@@ -23,9 +23,9 @@ const float Z_SUCTION_START_INCHES = 4.0;    // Start suction when this far down
 const int SERVO_PICKUP_POS = 52;    // Pickup orientation
 
 // Timing settings (ms)
-const int PICKUP_HOLD_TIME = 300;   // Hold time at pickup position
+const int PICKUP_HOLD_TIME = 100;   // Hold time at pickup position
 
-// Calculated positions (steps) - initialized at runtime
+// Calculated positions (steps) - initialized at runtime 
 int X_PICKUP_POS = 0;
 int Z_PICKUP_POS = 0;
 int Z_SUCTION_START_POS = 0;
