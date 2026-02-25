@@ -18,7 +18,7 @@ extern float STEPS_PER_INCH;
 // Position settings (inches)
 const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff
 const float Z_EARLY_RETURN_INCHES = 2.0;     // Z distance to travel up before starting X return home
-const float X_RETURN_HOME_INCHES = 0.25;     // Move X away from home at end of cycle
+const float X_RETURN_HOME_INCHES = 0.2;      // Match X_PICKUP_INCHES so next cycle doesn't move X before lowering Z
 
 // Timing settings (ms)
 const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
