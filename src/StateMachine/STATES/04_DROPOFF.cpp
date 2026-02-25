@@ -17,8 +17,7 @@ extern float STEPS_PER_INCH;
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
 const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff
-const float Z_EARLY_RETURN_INCHES = 2.0;     // Z distance to travel up before starting X return home
-const float X_RETURN_HOME_INCHES = 0.2;      // Match X_PICKUP_INCHES so next cycle doesn't move X before lowering Z
+const float Z_EARLY_RETURN_INCHES = 2.0;      // Z distance to travel up before starting X return home
 
 // Timing settings (ms)
 const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
@@ -30,12 +29,14 @@ const int Z_HOME_SPEED = 600;         // Z homing speed during X return
 // Calculated positions (steps) - initialized at runtime
 int Z_DROPOFF_POS = 0;
 int Z_EARLY_RETURN_POS = 0;
-int X_RETURN_HOME_POS = 0;
 static bool dropoffConfigInitialized = false;
 
 // External positions from other states
 extern int Z_HOME_POS;
 extern int Z_MAX_SPEED;
+
+// X pickup position from pickup state (steps)
+extern int X_PICKUP_POS;
 
 // Servo home position from return home state
 extern int SERVO_HOME_POS;
@@ -54,7 +55,6 @@ bool handleDropoff() {
   if (!dropoffConfigInitialized) {
     Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
     Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH);
-    X_RETURN_HOME_POS = (int)(X_RETURN_HOME_INCHES * STEPS_PER_INCH);
     dropoffConfigInitialized = true;
   }
   
@@ -114,9 +114,9 @@ bool handleDropoff() {
       if (zStepper && zStepper->getCurrentPosition() <= Z_EARLY_RETURN_POS) {
         swivelArmServo.write(SERVO_HOME_POS);
         digitalWrite(STAGE2_SIGNAL_PIN, HIGH);
-        // Start X moving to pickup position (no X homing)
+        // Start X moving back to the same pickup position (no X homing)
         if (xStepper) {
-          xStepper->moveTo(X_RETURN_HOME_POS);
+          xStepper->moveTo(X_PICKUP_POS);
         }
         // Start Z homing (run to switch) during X move
         if (zStepper) {
