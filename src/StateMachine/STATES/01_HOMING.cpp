@@ -25,10 +25,11 @@ extern int Z_MAX_SPEED;
 extern int X_HOME_POS;
 
 // External reference from pickup state
-extern int X_PICKUP_POS;
+extern const float X_PICKUP_INCHES;
 
 // Calculated positions (steps) - initialized at runtime
-int Z_HOME_POS = 0;  // Will be calculated on first call
+int Z_HOME_POS = 0;            // Will be calculated on first call
+static int xPickupPosHoming = 0;  // Local copy so homing can move to pickup even before pickup state runs
 static bool homingConfigInitialized = false;
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
@@ -44,6 +45,7 @@ bool handleHoming() {
   // Initialize calculated positions on first call
   if (!homingConfigInitialized) {
     Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH);
+    xPickupPosHoming = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
     homingConfigInitialized = true;
   }
   
@@ -85,7 +87,7 @@ bool handleHoming() {
           xStepper->forceStop();
           xStepper->setCurrentPosition(X_HOME_POS);
           xStepper->setSpeedInHz(X_MAX_SPEED);
-          xStepper->moveTo(X_PICKUP_POS);  // Move to pickup
+          xStepper->moveTo(xPickupPosHoming);  // Move to pickup
         }
         homingStep = 4;
       }

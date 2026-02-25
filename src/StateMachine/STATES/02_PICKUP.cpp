@@ -15,7 +15,7 @@ extern float STEPS_PER_INCH;
 //║ 📦 PICKUP STATE CONFIG                                                 ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-const float X_PICKUP_INCHES = 0.2;           // X pickup position
+extern const float X_PICKUP_INCHES = 0.2;    // X pickup position (shared with homing)
 const float Z_PICKUP_LOWER_INCHES = 6.35;    // Lower Z for pickup
 const float Z_SUCTION_START_INCHES = 4.0;    // Start suction when this far down
 
