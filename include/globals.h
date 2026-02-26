@@ -69,6 +69,8 @@ extern SystemState systemState;
 extern PickupState pickupState;
 extern TransportState transportState;
 extern DropoffState dropoffState;
+extern unsigned long lastCycleCompleteTime;
+extern bool autoHomePending;
 
 extern bool vacuumActive;
 

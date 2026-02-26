@@ -16,7 +16,7 @@ const float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homi
 
 // Homing speeds (steps/sec)
 const int X_HOME_SPEED = 800;    // X homing speed
-const int Z_HOME_SPEED = 600;    // Z homing speed
+const int Z_HOME_SPEED = 450;    // Z homing speed
 
 // External references from Config.cpp
 extern float STEPS_PER_INCH;

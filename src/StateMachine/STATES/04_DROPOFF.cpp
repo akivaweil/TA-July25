@@ -24,7 +24,7 @@ const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 
 // Speed settings
 const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec)
-const int Z_HOME_SPEED = 600;         // Z homing speed during X return
+const int Z_HOME_SPEED = 450;         // Z homing speed during X return
 
 // Calculated positions (steps) - initialized at runtime
 int Z_DROPOFF_POS = 0;
