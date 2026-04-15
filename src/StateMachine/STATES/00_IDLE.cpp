@@ -8,7 +8,7 @@ extern unsigned long stateTimer;
 //║ ⏸️  IDLE STATE CONFIG                                                  ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 const int START_SIGNAL_DELAY = 325;   // Delay after start signal before beginning pick cycle (ms)
-const unsigned long AUTO_HOME_IDLE_TIMEOUT = 5000;  // Auto-home if no start command after cycle complete (ms)
+const unsigned long AUTO_HOME_IDLE_TIMEOUT = 10000;  // Auto-home if no start command after cycle complete (ms)
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ ⏸️  IDLE STATE                                                         ║
