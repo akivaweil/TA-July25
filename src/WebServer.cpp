@@ -71,8 +71,7 @@ void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsE
         case WS_EVT_DATA: {
             AwsFrameInfo *info = (AwsFrameInfo*)arg;
             if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-                data[len] = 0;
-                String message = (char*)data;
+                String message((char*)data, len);  // Safe: construct with explicit length, no buffer overwrite
                 
                 JsonDocument doc;
                 DeserializationError error = deserializeJson(doc, message);
@@ -113,6 +112,7 @@ void setupWebServer() {
 }
 
 void updateDashboardStatus() {
+    ws.cleanupClients();  // Free heap from disconnected/slow clients every loop
     unsigned long currentTime = millis();
     if (ws.count() > 0 && (currentTime - lastDashboardUpdate >= DASHBOARD_UPDATE_INTERVAL)) {
         broadcastSystemStatus();
