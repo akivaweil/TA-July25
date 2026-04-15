@@ -13,12 +13,12 @@ extern float STEPS_PER_INCH;
 //║ 🚚 TRANSPORT STATE CONFIG                                              ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-const float X_DROPOFF_INCHES = 20.5;                             // X dropoff position
+const float X_DROPOFF_INCHES = 20.6;                             // X dropoff position
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
 
 // Servo settings (degrees)
 const int SERVO_TRAVEL_POS = 32;      // Travel position
-const int SERVO_DROPOFF_POS = 116;    // Dropoff orientation
+const int SERVO_DROPOFF_POS = 113;    // Dropoff orientation
 
 // Timing settings (ms)
 const int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
