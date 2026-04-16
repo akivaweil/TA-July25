@@ -31,7 +31,6 @@ enum SystemState {
   STATE_PICKUP,
   STATE_TRANSPORT, 
   STATE_DROPOFF,
-  STATE_RETURN_HOME,
   STATE_HOMING
 };
 
@@ -86,7 +85,6 @@ bool handleIdle();
 bool handlePickup();
 bool handleTransport();
 bool handleDropoff();
-bool handleReturnHome();
 void handleSerial();
 
 // Utility functions

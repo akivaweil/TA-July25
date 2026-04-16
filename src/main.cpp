@@ -15,7 +15,6 @@ bool handleIdle();
 bool handlePickup();
 bool handleTransport();
 bool handleDropoff();
-bool handleReturnHome();
 void handleSerial();
 
 // OTA function declarations (implemented in OTA_Manager.cpp)
@@ -188,11 +187,6 @@ void loop() {
       }
       break;
       
-    case STATE_RETURN_HOME:
-      if (handleReturnHome()) {
-        systemState = STATE_IDLE;
-      }
-      break;
   }
   
   // Handle serial commands

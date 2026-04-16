@@ -38,8 +38,8 @@ extern int Z_MAX_SPEED;
 // X pickup position from pickup state (steps)
 extern int X_PICKUP_POS;
 
-// Servo home position from return home state
-extern int SERVO_HOME_POS;
+// Servo neutral/home position (degrees)
+int SERVO_HOME_POS = 52;
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ 📤 DROPOFF STATE                                                       ║
