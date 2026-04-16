@@ -47,9 +47,6 @@ SystemState systemState = STATE_HOMING;
 PickupState pickupState = PICKUP_MOVE_X;
 TransportState transportState = TRANSPORT_ROTATE_SERVO;
 DropoffState dropoffState = DROPOFF_LOWER_Z;
-unsigned long lastCycleCompleteTime = 0;
-bool autoHomePending = false;
-
 // Timing variables
 unsigned long stateTimer = 0;
 bool vacuumActive = false;
@@ -191,8 +188,6 @@ void loop() {
       
     case STATE_DROPOFF:
       if (handleDropoff()) {
-        lastCycleCompleteTime = millis();
-        autoHomePending = true;
         systemState = STATE_IDLE;  // Go idle and wait for next start command
       }
       break;
