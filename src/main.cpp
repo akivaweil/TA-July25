@@ -4,7 +4,6 @@
 #include <Bounce2.h>
 #include "globals.h"
 #include "OTA/OTA_Upload.h"
-#include "WebServer.h"
 
 // Function declarations
 void setupPins();
@@ -74,9 +73,6 @@ void setup() {
   // Configure servo
   setupServo();
 
-  // Start Web Server
-  setupWebServer();
-  
   systemState = STATE_HOMING;
 }
 
@@ -201,9 +197,6 @@ void loop() {
   
   // Handle serial commands
   handleSerial();
-  
-  // Update dashboard status
-  updateDashboardStatus();
   
   // Yield to other tasks to reduce CPU load
   delay(1);
