@@ -4,6 +4,8 @@
 #include <Bounce2.h>
 #include "globals.h"
 #include "OTA/OTA_Upload.h"
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
 // Function declarations
 void setupPins();
@@ -53,6 +55,9 @@ bool vacuumActive = false;
 //* ************************ SETUP FUNCTION ********************************
 //* ************************************************************************
 void setup() {
+  // Disable brownout detector
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+
   // Initialize Serial communication
   Serial.begin(115200);
   delay(100);
