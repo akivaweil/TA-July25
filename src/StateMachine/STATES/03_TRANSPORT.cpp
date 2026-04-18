@@ -3,14 +3,30 @@
 #include <ESP32Servo.h>
 #include "globals.h"
 
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🚚 TRANSPORT STATE CONFIG                                             ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// X positions (inches from home) and derived step positions
+const float X_DROPOFF_INCHES   = 20.95f;                          // X dropoff position
+const float X_OVERSHOOT_INCHES = X_DROPOFF_INCHES + 1.75f;        // 1.75" past dropoff for servo rotation
+const float X_DROPOFF_POS      = X_DROPOFF_INCHES   * STEPS_PER_INCH;
+const float X_OVERSHOOT_POS    = X_OVERSHOOT_INCHES * STEPS_PER_INCH;
+
+// Servo orientations (degrees)
+const float SERVO_TRAVEL_POS  = 0.0f;    // Travel position
+const float SERVO_DROPOFF_POS = 80.0f;   // Dropoff orientation
+
+// Wait time for servo to rotate (ms)
+const float SERVO_ROTATION_TIME = 500.0f;
+
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern Servo swivelArmServo;
 extern unsigned long stateTimer;
 
-//* ************************************************************************
-//* ************************ TRANSPORT STATE *******************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🚚 TRANSPORT STATE                                                    ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles transporting the object from pickup to dropoff:
 // Rotate servo, move to overshoot, rotate servo again, move to dropoff
 
@@ -52,4 +68,4 @@ bool handleTransport() {
   }
   
   return false;  // Transport not complete
-} 
+}

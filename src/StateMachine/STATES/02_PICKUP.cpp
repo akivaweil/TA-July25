@@ -3,6 +3,21 @@
 #include <ESP32Servo.h>
 #include "globals.h"
 
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🤏 PICKUP STATE CONFIG                                                ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Z distances (inches from home) and derived step positions
+const float Z_PICKUP_LOWER_INCHES  = 7.0f;   // Lower Z this many inches for pickup
+const float Z_SUCTION_START_INCHES = 4.0f;   // Start suction when this far down
+const float Z_PICKUP_POS           = Z_PICKUP_LOWER_INCHES  * STEPS_PER_INCH;
+const float Z_SUCTION_START_POS    = Z_SUCTION_START_INCHES * STEPS_PER_INCH;
+
+// Servo orientation for pickup (degrees)
+const float SERVO_PICKUP_POS = 10.0f;
+
+// Hold time at pickup position (ms)
+const float PICKUP_HOLD_TIME = 300.0f;
+
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
@@ -10,9 +25,9 @@ extern Servo swivelArmServo;
 extern unsigned long stateTimer;
 extern bool vacuumActive;
 
-//* ************************************************************************
-//* ************************ PICKUP STATE **********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🤏 PICKUP STATE                                                       ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles the pickup sequence:
 // Move X to pickup position, set servo, lower Z, activate vacuum, wait, raise Z
 
@@ -62,4 +77,4 @@ bool handlePickup() {
   }
   
   return false;  // Pickup not complete
-} 
+}

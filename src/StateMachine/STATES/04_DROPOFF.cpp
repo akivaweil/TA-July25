@@ -2,14 +2,27 @@
 #include <FastAccelStepper.h>
 #include "globals.h"
 
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📦 DROPOFF STATE CONFIG                                               ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// Z distance (inches from home) and derived step position
+const float Z_DROPOFF_LOWER_INCHES = 5.5f;  // Lower Z this many inches for dropoff
+const float Z_DROPOFF_POS          = Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH;
+
+// Dropoff-specific Z speed (steps/s)
+const float Z_DROPOFF_SPEED = 10000.0f;
+
+// Hold time after releasing (ms)
+const float DROPOFF_HOLD_TIME = 100.0f;
+
 // External references to objects defined in main file
 extern FastAccelStepper *zStepper;
 extern unsigned long stateTimer;
 extern Bounce stopSignalStage2;
 
-//* ************************************************************************
-//* ************************ DROPOFF STATE *********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 📦 DROPOFF STATE                                                      ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state handles dropping off the object:
 // Check safety signal, lower Z, release vacuum, wait, raise Z, signal Stage 2
 
@@ -58,4 +71,4 @@ bool handleDropoff() {
   }
   
   return false;  // Dropoff not complete
-} 
+}

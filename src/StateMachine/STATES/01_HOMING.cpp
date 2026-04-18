@@ -2,15 +2,21 @@
 #include <FastAccelStepper.h>
 #include "globals.h"
 
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🏠 HOMING STATE CONFIG                                                ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+const float X_HOME_SPEED = 1000.0f;  // X homing speed (steps/s)
+const float Z_HOME_SPEED = 1000.0f;  // Z homing speed (steps/s)
+
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern Bounce zHomeSwitch;
 extern Bounce xHomeSwitch;
 
-//* ************************************************************************
-//* ************************ HOMING STATE **********************************
-//* ************************************************************************
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ 🏠 HOMING STATE                                                       ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // This state homes both Z and X axes sequentially
 // Z axis homes first, then moves up, then X axis homes and moves to pickup
 
@@ -69,4 +75,4 @@ bool handleHoming() {
   }
   
   return false;  // Homing not complete
-} 
+}
