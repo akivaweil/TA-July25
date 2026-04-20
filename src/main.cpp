@@ -146,8 +146,10 @@ void setupSteppers() {
 //* ************************ MAIN LOOP - STATE MACHINE ********************
 //* ************************************************************************
 void loop() {
-  // Handle OTA every loop to feed the task watchdog timer
-  handleOTA();
+  // Only accept OTA uploads while in IDLE state
+  if (systemState == STATE_IDLE) {
+    handleOTA();
+  }
   
   // Update all debouncers first
   zHomeSwitch.update();  // Z-axis: 3ms debounce
