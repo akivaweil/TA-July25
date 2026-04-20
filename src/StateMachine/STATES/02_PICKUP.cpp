@@ -29,7 +29,7 @@ const int PICKUP_HOLD_TIME = 100;   // Hold time at pickup position
 int X_PICKUP_POS = 0;
 int Z_PICKUP_POS = 0;
 int Z_SUCTION_START_POS = 0;
-int Z_SERVO_ROTATE_POS = 0;  // Halfway up on Z raise, where servo starts rotating to travel position
+int Z_SERVO_ROTATE_POS = 0;  // One-third up on Z raise, where servo starts rotating to travel position
 static bool pickupConfigInitialized = false;
 static bool servoRotatedDuringRaise = false;
 
@@ -51,7 +51,7 @@ bool handlePickup() {
     X_PICKUP_POS = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
     Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);
     Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH);
-    Z_SERVO_ROTATE_POS = (Z_PICKUP_POS + Z_HOME_POS) / 2;
+    Z_SERVO_ROTATE_POS = (2 * Z_PICKUP_POS + Z_HOME_POS) / 3;
     pickupConfigInitialized = true;
   }
   
@@ -90,7 +90,7 @@ bool handlePickup() {
       break;
       
     case PICKUP_RAISE_Z:
-      // Start rotating servo to travel position when halfway to the top
+      // Start rotating servo to travel position after Z has moved a third of the way up
       if (zStepper && !servoRotatedDuringRaise &&
           zStepper->getCurrentPosition() <= Z_SERVO_ROTATE_POS) {
         swivelArmServo.write(SERVO_TRAVEL_POS);
