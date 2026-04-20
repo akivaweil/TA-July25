@@ -15,6 +15,8 @@ extern float STEPS_PER_INCH;
 // Position settings (inches)
 const float X_DROPOFF_INCHES = 20.5;                             // X dropoff position
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
+const float X_SERVO_ROTATE_LEAD_INCHES = 3.0;                    // Start servo rotation this far before dropoff
+const float X_SERVO_ROTATE_INCHES = (X_DROPOFF_INCHES - X_SERVO_ROTATE_LEAD_INCHES);
 
 // Servo settings (degrees)
 extern const int SERVO_TRAVEL_POS = 32;      // Travel position (shared with pickup)
@@ -26,7 +28,9 @@ const int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
 // Calculated positions (steps) - initialized at runtime
 int X_DROPOFF_POS = 0;
 int X_OVERSHOOT_POS = 0;
+int X_SERVO_ROTATE_POS = 0;
 static bool transportConfigInitialized = false;
+static bool servoRotatedEnRoute = false;
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ 🚚 TRANSPORT STATE                                                     ║
@@ -39,6 +43,7 @@ bool handleTransport() {
   if (!transportConfigInitialized) {
     X_DROPOFF_POS = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH);
     X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);
+    X_SERVO_ROTATE_POS = (int)(X_SERVO_ROTATE_INCHES * STEPS_PER_INCH);
     transportConfigInitialized = true;
   }
   
@@ -48,12 +53,18 @@ bool handleTransport() {
       if (xStepper) {
         xStepper->moveTo(X_OVERSHOOT_POS);
       }
+      servoRotatedEnRoute = false;
       transportState = TRANSPORT_MOVE_TO_OVERSHOOT;
       break;
       
     case TRANSPORT_MOVE_TO_OVERSHOOT:
-      if (isMotorAtTarget(xStepper)) {
+      // Begin rotating servo to dropoff orientation 3" before reaching dropoff
+      if (xStepper && !servoRotatedEnRoute &&
+          xStepper->getCurrentPosition() >= X_SERVO_ROTATE_POS) {
         swivelArmServo.write(SERVO_DROPOFF_POS);
+        servoRotatedEnRoute = true;
+      }
+      if (isMotorAtTarget(xStepper)) {
         transportState = TRANSPORT_WAIT_SERVO;
       }
       break;
