@@ -29,10 +29,15 @@ const int PICKUP_HOLD_TIME = 100;   // Hold time at pickup position
 int X_PICKUP_POS = 0;
 int Z_PICKUP_POS = 0;
 int Z_SUCTION_START_POS = 0;
+int Z_SERVO_ROTATE_POS = 0;  // Halfway up on Z raise, where servo starts rotating to travel position
 static bool pickupConfigInitialized = false;
+static bool servoRotatedDuringRaise = false;
 
 // External Z home position from homing state
 extern int Z_HOME_POS;
+
+// External travel servo position from transport state
+extern const int SERVO_TRAVEL_POS;
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ 📦 PICKUP STATE                                                        ║
@@ -46,6 +51,7 @@ bool handlePickup() {
     X_PICKUP_POS = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
     Z_PICKUP_POS = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);
     Z_SUCTION_START_POS = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH);
+    Z_SERVO_ROTATE_POS = (Z_PICKUP_POS + Z_HOME_POS) / 2;
     pickupConfigInitialized = true;
   }
   
@@ -78,11 +84,18 @@ bool handlePickup() {
         if (zStepper) {
           zStepper->moveTo(Z_HOME_POS);  // Move to offset position (0.2" from physical home)
         }
+        servoRotatedDuringRaise = false;
         pickupState = PICKUP_RAISE_Z;
       }
       break;
       
     case PICKUP_RAISE_Z:
+      // Start rotating servo to travel position when halfway to the top
+      if (zStepper && !servoRotatedDuringRaise &&
+          zStepper->getCurrentPosition() <= Z_SERVO_ROTATE_POS) {
+        swivelArmServo.write(SERVO_TRAVEL_POS);
+        servoRotatedDuringRaise = true;
+      }
       if (isMotorAtTarget(zStepper)) {
         pickupState = PICKUP_DONE;
       }

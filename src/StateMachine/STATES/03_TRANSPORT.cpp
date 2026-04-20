@@ -17,7 +17,7 @@ const float X_DROPOFF_INCHES = 20.5;                             // X dropoff po
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
 
 // Servo settings (degrees)
-const int SERVO_TRAVEL_POS = 32;      // Travel position
+extern const int SERVO_TRAVEL_POS = 32;      // Travel position (shared with pickup)
 const int SERVO_DROPOFF_POS = 112;    // Dropoff orientation
 
 // Timing settings (ms)
