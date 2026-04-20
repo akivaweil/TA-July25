@@ -5,9 +5,15 @@
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
+extern FastAccelStepper *zStepper;
 extern ServoControl swivelArmServo;
 extern unsigned long stateTimer;
 extern float STEPS_PER_INCH;
+
+// External Z dropoff settings from dropoff state
+extern int Z_DROPOFF_POS;
+extern const int Z_DROPOFF_SPEED;
+extern const float Z_DROPOFF_LOWER_INCHES;
 
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ 🚚 TRANSPORT STATE CONFIG                                              ║
@@ -21,9 +27,6 @@ const float X_SERVO_ROTATE_INCHES = (X_DROPOFF_INCHES - X_SERVO_ROTATE_LEAD_INCH
 // Servo settings (degrees)
 extern const int SERVO_TRAVEL_POS = 32;      // Travel position (shared with pickup)
 const int SERVO_DROPOFF_POS = 112;    // Dropoff orientation
-
-// Timing settings (ms)
-const int SERVO_ROTATION_TIME = 500;  // Wait time for servo rotation
 
 // Calculated positions (steps) - initialized at runtime
 int X_DROPOFF_POS = 0;
@@ -44,6 +47,10 @@ bool handleTransport() {
     X_DROPOFF_POS = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH);
     X_OVERSHOOT_POS = (int)(X_OVERSHOOT_INCHES * STEPS_PER_INCH);
     X_SERVO_ROTATE_POS = (int)(X_SERVO_ROTATE_INCHES * STEPS_PER_INCH);
+    // Ensure Z dropoff position is computed even if dropoff hasn't run yet
+    if (Z_DROPOFF_POS == 0) {
+      Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
+    }
     transportConfigInitialized = true;
   }
   
@@ -58,21 +65,20 @@ bool handleTransport() {
       break;
       
     case TRANSPORT_MOVE_TO_OVERSHOOT:
-      // Begin rotating servo to dropoff orientation 3" before reaching dropoff
+      // Begin rotating servo to dropoff orientation a bit before reaching dropoff
       if (xStepper && !servoRotatedEnRoute &&
           xStepper->getCurrentPosition() >= X_SERVO_ROTATE_POS) {
         swivelArmServo.write(SERVO_DROPOFF_POS);
         servoRotatedEnRoute = true;
       }
       if (isMotorAtTarget(xStepper)) {
-        transportState = TRANSPORT_WAIT_SERVO;
-      }
-      break;
-      
-    case TRANSPORT_WAIT_SERVO:
-      if (waitForTime(SERVO_ROTATION_TIME)) {
+        // Immediately start X moving back to dropoff AND start lowering Z concurrently
         if (xStepper) {
           xStepper->moveTo(X_DROPOFF_POS);
+        }
+        if (zStepper) {
+          zStepper->setSpeedInHz(Z_DROPOFF_SPEED);
+          zStepper->moveTo(Z_DROPOFF_POS);
         }
         transportState = TRANSPORT_MOVE_TO_DROPOFF;
       }

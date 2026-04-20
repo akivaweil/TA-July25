@@ -16,14 +16,14 @@ extern float STEPS_PER_INCH;
 //║ 📤 DROPOFF STATE CONFIG                                                ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff
-const float Z_EARLY_RETURN_INCHES = 2.0;      // Z distance to travel up before starting X return home
+extern const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff (shared with transport)
+const float Z_EARLY_RETURN_INCHES = 2.0;             // Z distance to travel up before starting X return home
 
 // Timing settings (ms)
 const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
 
 // Speed settings
-const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec)
+extern const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec, shared with transport)
 const int Z_HOME_SPEED = 450;         // Z homing speed during X return
 
 // Calculated positions (steps) - initialized at runtime
