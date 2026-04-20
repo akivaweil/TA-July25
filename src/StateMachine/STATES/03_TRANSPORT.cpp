@@ -15,7 +15,7 @@ extern float STEPS_PER_INCH;
 // Position settings (inches)
 const float X_DROPOFF_INCHES = 20.5;                             // X dropoff position
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
-const float X_SERVO_ROTATE_LEAD_INCHES = 3.0;                    // Start servo rotation this far before dropoff
+const float X_SERVO_ROTATE_LEAD_INCHES = 2.0;                    // Start servo rotation this far before dropoff
 const float X_SERVO_ROTATE_INCHES = (X_DROPOFF_INCHES - X_SERVO_ROTATE_LEAD_INCHES);
 
 // Servo settings (degrees)
