@@ -20,7 +20,8 @@ extern const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff (sha
 const float Z_EARLY_RETURN_INCHES = 2.0;             // Z distance to travel up before starting X return home
 
 // Timing settings (ms)
-const int DROPOFF_HOLD_TIME = 100;    // Hold time at dropoff position
+const int DROPOFF_HOLD_TIME = 10;     // Hold time at dropoff position
+const int DROPOFF_SETTLE_TIME = 25;   // Settle time before raising Z
 
 // Speed settings
 extern const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec, shared with transport)
@@ -98,7 +99,7 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_SETTLE:
-      if (waitForTime(50)) {
+      if (waitForTime(DROPOFF_SETTLE_TIME)) {
         if (zStepper) {
           zStepper->setSpeedInHz(Z_MAX_SPEED);  // Back to normal speed
           zStepper->moveTo(Z_HOME_POS);  // Move up toward home area
