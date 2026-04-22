@@ -35,6 +35,9 @@ static bool dropoffConfigInitialized = false;
 // External positions from other states
 extern int Z_HOME_POS;
 extern int Z_MAX_SPEED;
+extern int X_HOME_POS;
+extern int X_MAX_SPEED;
+extern const int X_HOME_SPEED;
 
 // X pickup position from pickup state (steps)
 extern int X_PICKUP_POS;
@@ -147,18 +150,48 @@ bool handleDropoff() {
         }
       } else if (isMotorAtTarget(zStepper) && isMotorAtTarget(xStepper)) {
         zHomingOffsetPhase = false;
+        dropoffState = DROPOFF_X_AT_PICKUP;
+      }
+      break;
+
+    case DROPOFF_X_AT_PICKUP:
+      //! ************************************************************************
+      //! X reached pickup return position — now re-home X to correct any drift
+      //! ************************************************************************
+      if (isMotorAtTarget(xStepper)) {
+        digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
+        if (xStepper) {
+          xStepper->setSpeedInHz(X_HOME_SPEED);
+          xStepper->move(-50000);  // Move negative toward home switch
+        }
+        dropoffState = DROPOFF_X_HOME;
+      }
+      break;
+
+    case DROPOFF_X_HOME:
+      //! ************************************************************************
+      //! Wait for X home switch, then zero position and move back to pickup
+      //! ************************************************************************
+      if (digitalRead(X_HOME_SWITCH_PIN) == HIGH) {
+        if (xStepper) {
+          xStepper->forceStop();
+          xStepper->setCurrentPosition(X_HOME_POS);
+          xStepper->setSpeedInHz(X_MAX_SPEED);
+          xStepper->moveTo(X_PICKUP_POS);
+        }
+        dropoffState = DROPOFF_X_RETURN_PICKUP;
+      }
+      break;
+
+    case DROPOFF_X_RETURN_PICKUP:
+      if (isMotorAtTarget(xStepper)) {
         dropoffState = DROPOFF_DONE;
       }
       break;
-      
+
     case DROPOFF_DONE:
-      // Wait for X to reach return home position
-      if (isMotorAtTarget(xStepper)) {
-        digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
-        dropoffState = DROPOFF_LOWER_Z;  // Reset for next cycle
-        return true;  // Dropoff complete
-      }
-      break;
+      dropoffState = DROPOFF_LOWER_Z;  // Reset for next cycle
+      return true;  // Dropoff complete
   }
   
   return false;  // Dropoff not complete
