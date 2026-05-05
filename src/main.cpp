@@ -49,6 +49,7 @@ TransportState transportState = TRANSPORT_ROTATE_SERVO;
 DropoffState dropoffState = DROPOFF_LOWER_Z;
 // Timing variables
 unsigned long stateTimer = 0;
+unsigned long lastCycleEndTime = 0;  // Tracks when last cycle finished for min inter-cycle delay
 bool vacuumActive = false;
 
 //* ************************************************************************
@@ -88,7 +89,7 @@ void setupPins() {
   pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
   pinMode(STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
   pinMode(X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
-  pinMode(Z_HOME_SWITCH_PIN, INPUT);  // Z-axis: direct high reading, no pull-down
+  pinMode(Z_HOME_SWITCH_PIN, INPUT_PULLDOWN);
   pinMode(STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
   
   // Output pins
@@ -191,6 +192,7 @@ void loop() {
     case STATE_DROPOFF:
       if (handleDropoff()) {
         systemState = STATE_IDLE;  // Go idle and wait for next start command
+        lastCycleEndTime = millis();  // Record end time to enforce inter-cycle delay
       }
       break;
       

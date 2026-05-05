@@ -16,7 +16,7 @@ extern float STEPS_PER_INCH;
 //║ 📤 DROPOFF STATE CONFIG                                                ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-extern const float Z_DROPOFF_LOWER_INCHES = 6.35;    // Lower Z for dropoff (shared with transport)
+extern const float Z_DROPOFF_LOWER_INCHES = 6.65;    // Lower Z for dropoff (shared with transport)
 const float Z_EARLY_RETURN_INCHES = 2.0;             // Z distance to travel up before starting X return home
 
 // Timing settings (ms)

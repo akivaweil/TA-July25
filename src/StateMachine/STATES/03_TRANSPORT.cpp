@@ -19,14 +19,14 @@ extern const float Z_DROPOFF_LOWER_INCHES;
 //║ 🚚 TRANSPORT STATE CONFIG                                              ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
 // Position settings (inches)
-const float X_DROPOFF_INCHES = 20.5;                             // X dropoff position
+const float X_DROPOFF_INCHES = 20.75;                             // X dropoff position
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
 const float X_SERVO_ROTATE_LEAD_INCHES = 2.0;                    // Start servo rotation this far before dropoff
 const float X_SERVO_ROTATE_INCHES = (X_DROPOFF_INCHES - X_SERVO_ROTATE_LEAD_INCHES);
 
 // Servo settings (degrees)
 extern const int SERVO_TRAVEL_POS = 32;      // Travel position (shared with pickup)
-const int SERVO_DROPOFF_POS = 112;    // Dropoff orientation
+const int SERVO_DROPOFF_POS = 110;    // Dropoff orientation (higher is more clockwise)
 
 // Calculated positions (steps) - initialized at runtime
 int X_DROPOFF_POS = 0;
