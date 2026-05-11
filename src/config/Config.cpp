@@ -31,4 +31,4 @@ int Z_ACCELERATION = 10000;    // Z acceleration (steps/sec²)
 //╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
 //║ ⚙️  INPUT DEBOUNCE SETTINGS                                            ║
 //╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
-float Z_HOME_SWITCH_DEBOUNCE_MS = 3.0;  // Z home switch debounce (ms)
+float Z_HOME_SWITCH_DEBOUNCE_MS = 2.0;  // Z home switch debounce (ms)
