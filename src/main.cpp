@@ -56,9 +56,6 @@ bool vacuumActive = false;
 //* ************************ SETUP FUNCTION ********************************
 //* ************************************************************************
 void setup() {
-  // Disable brownout detector
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-
   // Initialize Serial communication
   Serial.begin(115200);
   delay(100);
