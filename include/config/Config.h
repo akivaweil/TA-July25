@@ -35,4 +35,9 @@ extern int X_ACCELERATION;     // X acceleration (steps/sec²)
 extern int Z_MAX_SPEED;        // Z max speed (steps/sec)
 extern int Z_ACCELERATION;     // Z acceleration (steps/sec²)
 
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  INPUT DEBOUNCE SETTINGS                                            ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+extern float Z_HOME_SWITCH_DEBOUNCE_MS;  // Z home switch debounce (ms)
+
 #endif

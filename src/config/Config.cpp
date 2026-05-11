@@ -27,3 +27,8 @@ int X_MAX_SPEED = 6000;        // X max speed (steps/sec)
 int X_ACCELERATION = 10000;    // X acceleration (steps/sec²)
 int Z_MAX_SPEED = 10000;       // Z max speed (steps/sec)
 int Z_ACCELERATION = 10000;    // Z acceleration (steps/sec²)
+
+//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
+//║ ⚙️  INPUT DEBOUNCE SETTINGS                                            ║
+//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+float Z_HOME_SWITCH_DEBOUNCE_MS = 20.0;  // Z home switch debounce (ms)

@@ -106,9 +106,9 @@ void setupPins() {
 void setupDebouncers() {
   // X-axis: no debounce - direct read
   
-  // Z-axis: 3ms debounce for reliable homing
+  // Z-axis: debounce for reliable homing
   zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
-  zHomeSwitch.interval(3);  // 3ms debounce
+  zHomeSwitch.interval((uint16_t)Z_HOME_SWITCH_DEBOUNCE_MS);
   
   // Configure input signals with 10ms debounce
   startButton.attach(START_BUTTON_PIN);
@@ -153,7 +153,7 @@ void loop() {
   }
   
   // Update all debouncers first
-  zHomeSwitch.update();  // Z-axis: 3ms debounce
+  zHomeSwitch.update();
   startButton.update();
   stage1Signal.update();
   stopSignalStage2.update();
