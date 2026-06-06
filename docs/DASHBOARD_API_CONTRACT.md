@@ -55,12 +55,30 @@ Response body (Content-Type `application/json`):
   1. Validate each key is known and the value is within `[min,max]`. Unknown key or
      out-of-range → respond `{ "ok": false, "message": "<key> invalid/out of range" }`
      (HTTP 400) and change nothing.
-  2. ALWAYS persist accepted values immediately to NVS/EEPROM.
-  3. If `isSafeToApplyConfig()` (machine IDLE/HOMING) → apply to the live runtime variables
-     now and respond `{ "ok": true, "applied": true, "deferred": false, "message": "saved" }`.
-  4. If NOT safe (mid-cycle) → set a `configDirty` flag, do NOT touch live motion variables,
-     respond `{ "ok": true, "applied": false, "deferred": true, "message": "pending — applies at next idle" }`.
-     The main loop must apply `configDirty` on next entry to IDLE.
+  2. ALWAYS persist accepted values immediately to NVS/EEPROM (so a power cut before the next
+     idle still keeps the new value). For a value that is also restored at boot, this means the
+     boot/load path MUST restore it too — saved-but-not-loaded is a bug.
+  3. If `isSafeToApplyConfig()` → apply to the live runtime variables now and respond
+     `{ "ok": true, "applied": true, "deferred": false, "message": "saved" }`.
+  4. If NOT safe → ONLY persist + set a `configDirty` flag. **Do NOT write ANY live runtime
+     variable on this path** (not even a "harmless" one — several machines read tunables
+     continuously mid-cycle). Respond
+     `{ "ok": true, "applied": false, "deferred": true, "message": "pending — applies at next idle" }`.
+     The main loop applies `configDirty` (copy persisted → live, recompute) on next entry to IDLE.
+
+> **`isSafeToApplyConfig()` = the machine is in its truly-motionless IDLE state ONLY.**
+> HOMING is NOT safe: on these machines homing actively drives the steppers (speed-sensitive
+> limit-switch seeks), so applying a speed/position change mid-home can retarget an in-flight
+> move. Defer during HOMING and every cycle state; apply on the next IDLE entry. (Boot-time
+> `applySettings()`/`applyTASettings()` called once in `setup()` before motion starts is fine.)
+
+### POST response plumbing (both async forks + sync) — avoid the empty-body trap
+- The response MUST be sent from whichever path actually has the body. With the async `onBody`
+  accumulator, the `onRequest` handler runs too; gate it on `request->contentLength() == 0`
+  (NOT on a `_tempObject == nullptr` sentinel, which the me-no-dev fork nulls after `onBody`
+  and would make every real POST fall through to an empty-body 400). When `contentLength()==0`,
+  reply `400 {"ok":false,"message":"empty body"}` with the CORS header; otherwise let `onBody`
+  send the real response on the final chunk. Sync `WebServer` reads `arg("plain")` directly.
 
 ## CORS (identical on every machine)
 - Add header `Access-Control-Allow-Origin: *` to ALL `/api/*` responses.
@@ -79,7 +97,7 @@ void setupConfigApi(<ServerType>& server);
 String buildStatusJson();                 // GET /api/status body
 String buildConfigJson();                 // GET /api/config body
 bool   applyConfigJson(const String& body, bool& outDeferred, String& outMsg); // POST handler core
-bool   isSafeToApplyConfig();             // true only when IDLE/HOMING
+bool   isSafeToApplyConfig();             // true ONLY in the motionless IDLE state (NOT homing)
 ```
 
 `MachineSettings.{h,cpp}` owns the persisted struct + `loadSettings()` / `saveSettings()` /

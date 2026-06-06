@@ -2,6 +2,7 @@
 #include <FastAccelStepper.h>
 #include "globals.h"
 #include "config/Pins_Definitions.h"
+#include "ConfigApi/MachineSettings.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -9,8 +10,9 @@ extern FastAccelStepper *zStepper;
 extern Bounce zHomeSwitch;
 
 // HOMING STATE CONFIG
-// Position settings (inches)
-const float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
+// Position settings (inches) - non-curated derived-position input (extern so
+// applyTASettings() can recompute the derived steps).
+extern const float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
 
 // Homing speeds (steps/sec)
 extern const int X_HOME_SPEED = 800;    // X homing speed (shared with end-of-cycle X homing)
@@ -22,13 +24,10 @@ extern int X_MAX_SPEED;
 extern int Z_MAX_SPEED;
 extern int X_HOME_POS;
 
-// External reference from pickup state
-extern const float X_PICKUP_INCHES;
-
-// Calculated positions (steps) - initialized at runtime
-int Z_HOME_POS = 0;            // Will be calculated on first call
-static int xPickupPosHoming = 0;  // Local copy so homing can move to pickup even before pickup state runs
-static bool homingConfigInitialized = false;
+// Calculated positions (steps) - maintained by applyTASettings()
+int Z_HOME_POS = 0;
+// X pickup step target, maintained by applyTASettings().
+extern int X_PICKUP_POS;
 
 // HOMING STATE
 // This state homes both Z and X axes sequentially
@@ -37,14 +36,7 @@ static bool homingConfigInitialized = false;
 bool handleHoming() {
   static int homingStep = 0;
   static unsigned long zHomingStartTime = 0;
-  
-  // Initialize calculated positions on first call
-  if (!homingConfigInitialized) {
-    Z_HOME_POS = (int)(Z_HOME_OFFSET_INCHES * STEPS_PER_INCH);
-    xPickupPosHoming = (int)(X_PICKUP_INCHES * STEPS_PER_INCH);
-    homingConfigInitialized = true;
-  }
-  
+
   switch(homingStep) {
     case 0:  // Start Z homing
       if (zStepper) {
@@ -83,7 +75,7 @@ bool handleHoming() {
           xStepper->forceStop();
           xStepper->setCurrentPosition(X_HOME_POS);
           xStepper->setSpeedInHz(X_MAX_SPEED);
-          xStepper->moveTo(xPickupPosHoming);  // Move to pickup
+          xStepper->moveTo(X_PICKUP_POS);  // Move to pickup
         }
         homingStep = 4;
       }

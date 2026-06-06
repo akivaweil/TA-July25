@@ -4,6 +4,8 @@
 #include <Bounce2.h>
 #include "globals.h"
 #include "OTA/OTA_Upload.h"
+#include "ConfigApi/MachineSettings.h"
+#include "ConfigApi/MachineConfigApi.h"
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
@@ -60,20 +62,29 @@ void setup() {
   Serial.begin(115200);
   delay(100);
   
-  // Initialize OTA functionality
+  // Initialize OTA functionality (connects WiFi)
   setupOTA();
-  
+
+  // Load persisted curated settings from NVS (seeds defaults on first boot)
+  loadSettings();
+
+  // Start the REST config/status server + central dashboard (WiFi is up now)
+  setupWebServer();
+
   // Configure pins
   setupPins();
-  
+
   // Configure debouncers
   setupDebouncers();
-  
+
   // Configure steppers
   setupSteppers();
-  
+
   // Configure servo
   setupServo();
+
+  // Apply settings + recompute all derived step positions now that steppers exist
+  applyTASettings();
 
   systemState = STATE_HOMING;
 }
@@ -147,6 +158,17 @@ void loop() {
   // Only accept OTA uploads while in IDLE or HOMING state
   if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
     handleOTA();
+  }
+
+  // Apply any deferred config changes ONLY in the truly-motionless IDLE state.
+  // HOMING actively drives the steppers, so applying a speed/position change
+  // there could retarget an in-flight move. The deferred POST path left the live
+  // globals untouched and persisted the new values to NVS, so copy persisted ->
+  // live first, then recompute derived positions and re-apply motor speeds.
+  if (systemState == STATE_IDLE && configDirty) {
+    loadSettings();      // copy persisted NVS values into the live globals
+    applyTASettings();   // recompute derived positions + re-apply motor speeds
+    configDirty = false;
   }
   
   // Update all debouncers first

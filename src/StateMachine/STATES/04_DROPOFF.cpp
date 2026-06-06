@@ -2,6 +2,7 @@
 #include <FastAccelStepper.h>
 #include "ServoControl.h"
 #include "globals.h"
+#include "ConfigApi/MachineSettings.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -13,22 +14,21 @@ extern ServoControl swivelArmServo;
 extern float STEPS_PER_INCH;
 
 // DROPOFF STATE CONFIG
-// Position settings (inches)
-extern const float Z_DROPOFF_LOWER_INCHES = 6.65;    // Lower Z for dropoff (shared with transport)
-const float Z_EARLY_RETURN_INCHES = 2.0;             // Z distance to travel up before starting X return home
+// Curated settings (Z_DROPOFF_LOWER_INCHES, DROPOFF_SETTLE_TIME, SERVO_HOME_POS,
+// Z_DROPOFF_SPEED) are now mutable globals owned by MachineSettings.cpp.
+
+// Non-curated derived-position input (extern const so applyTASettings() can use it)
+extern const float Z_EARLY_RETURN_INCHES = 2.0;      // Z distance to travel up before starting X return home
 
 // Timing settings (ms)
 const int DROPOFF_HOLD_TIME = 10;     // Hold time at dropoff position
-const int DROPOFF_SETTLE_TIME = 25;   // Settle time before raising Z
 
 // Speed settings
-extern const int Z_DROPOFF_SPEED = 15000;    // Z speed for dropoff (steps/sec, shared with transport)
 const int Z_HOME_SPEED = 450;         // Z homing speed during X return
 
-// Calculated positions (steps) - initialized at runtime
+// Calculated positions (steps) - maintained by applyTASettings()
 int Z_DROPOFF_POS = 0;
 int Z_EARLY_RETURN_POS = 0;
-static bool dropoffConfigInitialized = false;
 
 // External positions from other states
 extern int Z_HOME_POS;
@@ -40,9 +40,6 @@ extern const int X_HOME_SPEED;
 // X pickup position from pickup state (steps)
 extern int X_PICKUP_POS;
 
-// Servo neutral/home position (degrees)
-int SERVO_HOME_POS = 52;
-
 // DROPOFF STATE
 // This state handles dropping off the object:
 // Check safety signal, lower Z, release vacuum, wait, raise Z with early X return
@@ -51,13 +48,6 @@ bool handleDropoff() {
   static bool zHomingOffsetPhase = false;
   static unsigned long zHomingStartTime = 0;
 
-  // Initialize calculated positions on first call
-  if (!dropoffConfigInitialized) {
-    Z_DROPOFF_POS = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
-    Z_EARLY_RETURN_POS = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH);
-    dropoffConfigInitialized = true;
-  }
-  
   switch(dropoffState) {
     case DROPOFF_LOWER_Z:
       // Check safety signal before lowering (using debounced input)
