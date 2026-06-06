@@ -1,9 +1,7 @@
 #ifndef MACHINE_CONFIG_API_H
 #define MACHINE_CONFIG_API_H
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🌐 MACHINE CONFIG API (shared cross-machine REST contract)           ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// MACHINE CONFIG API (shared cross-machine REST contract)
 // Implements the canonical dashboard REST contract for this machine (TA):
 //   GET  /api/status   live read-only status + flat sensors map
 //   GET  /api/config   self-describing curated settings (fields[])

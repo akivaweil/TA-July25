@@ -1,9 +1,7 @@
 #ifndef MACHINE_SETTINGS_H
 #define MACHINE_SETTINGS_H
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ ⚙️ MACHINE SETTINGS (NVS-backed curated config for the dashboard)    ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// MACHINE SETTINGS (NVS-backed curated config for the dashboard)
 // Owns the 12 curated, runtime-editable settings for the Transfer Arm (TA).
 // All curated values are de-const'd mutable globals (single definition here).
 // applyTASettings() copies NVS values into the live globals, recomputes every

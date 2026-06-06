@@ -6,9 +6,7 @@
 #include "globals.h"
 #include "config/Pins_Definitions.h"
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🌐 MACHINE CONFIG API IMPLEMENTATION                                 ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// MACHINE CONFIG API IMPLEMENTATION
 
 extern const char DASHBOARD_HTML[] PROGMEM;  // src/WebDashboard/dashboard_html.inc
 
