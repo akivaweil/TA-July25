@@ -1,5 +1,4 @@
-#ifndef MACHINE_CONFIG_API_H
-#define MACHINE_CONFIG_API_H
+#pragma once
 
 // MACHINE CONFIG API (shared cross-machine REST contract)
 // Implements the canonical dashboard REST contract for this machine (TA):
@@ -27,5 +26,3 @@ bool   isSafeToApplyConfig();                                              // tr
 
 // Set true by a deferred POST; the main loop applies it on next IDLE entry.
 extern volatile bool configDirty;
-
-#endif // MACHINE_CONFIG_API_H

@@ -14,7 +14,7 @@ const unsigned long MIN_CYCLE_INTERVAL_MS = 2000; // Minimum time between consec
 // When triggered, waits for START_SIGNAL_DELAY before transitioning to pickup sequence
 // Also enforces a minimum interval between consecutive cycles
 
-bool handleIdle() {
+bool handleIdleState() {
   // Enforce minimum interval between cycles (skip on first cycle after boot/homing)
   if (lastCycleEndTime != 0 && (millis() - lastCycleEndTime) < MIN_CYCLE_INTERVAL_MS) {
     stateTimer = 0;  // Reset start delay timer while waiting on cooldown

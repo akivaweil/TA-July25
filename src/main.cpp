@@ -14,37 +14,31 @@ void setupPins();
 void setupSteppers();
 void setupServo();
 void setupDebouncers();
-bool handleHoming();
-bool handleIdle();
-bool handlePickup();
-bool handleTransport();
-bool handleDropoff();
+bool handleHomingState();
+bool handleIdleState();
+bool handlePickupState();
+bool handleTransportState();
+bool handleDropoffState();
 void handleSerial();
 
-// OTA function declarations (implemented in OTA_Manager.cpp)
-// void initOTA();
+// OTA function declarations (implemented in OTA_Upload.cpp)
+// void setupOTA();
 // void handleOTA();
 
-//* ************************************************************************
-//* ************************ HARDWARE OBJECTS *****************************
-//* ************************************************************************
+// Hardware objects
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *xStepper = NULL;
 FastAccelStepper *zStepper = NULL;
 ServoControl swivelArmServo;
 
-//* ************************************************************************
-//* ************************ BOUNCE2 OBJECTS *******************************
-//* ************************************************************************
+// Bounce2 objects
 Bounce xHomeSwitch = Bounce();
 Bounce zHomeSwitch = Bounce();
 Bounce startButton = Bounce();
 Bounce stage1Signal = Bounce();
 Bounce stopSignalStage2 = Bounce();
 
-//* ************************************************************************
-//* ************************ STATE VARIABLES *******************************
-//* ************************************************************************
+// State variables
 SystemState systemState = STATE_HOMING;
 PickupState pickupState = PICKUP_MOVE_X;
 TransportState transportState = TRANSPORT_ROTATE_SERVO;
@@ -54,9 +48,7 @@ unsigned long stateTimer = 0;
 unsigned long lastCycleEndTime = 0;  // Tracks when last cycle finished for min inter-cycle delay
 bool vacuumActive = false;
 
-//* ************************************************************************
-//* ************************ SETUP FUNCTION ********************************
-//* ************************************************************************
+// Setup function
 void setup() {
   // Initialize Serial communication
   Serial.begin(115200);
@@ -89,9 +81,7 @@ void setup() {
   systemState = STATE_HOMING;
 }
 
-//* ************************************************************************
-//* ************************ SETUP FUNCTIONS *******************************
-//* ************************************************************************
+// Setup functions
 void setupPins() {
   // Input pins
   pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
@@ -151,9 +141,7 @@ void setupSteppers() {
   vacuumActive = false;
 }
 
-//* ************************************************************************
-//* ************************ MAIN LOOP - STATE MACHINE ********************
-//* ************************************************************************
+// Main loop - state machine
 void loop() {
   // Only accept OTA uploads while in IDLE or HOMING state
   if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
@@ -182,34 +170,34 @@ void loop() {
   // Main state machine
   switch(systemState) {
     case STATE_HOMING:
-      if (handleHoming()) {
+      if (handleHomingState()) {
         systemState = STATE_IDLE;
       }
       break;
-      
+
     case STATE_IDLE:
-      if (handleIdle()) {
+      if (handleIdleState()) {
         systemState = STATE_PICKUP;
         pickupState = PICKUP_MOVE_X;
       }
       break;
-      
+
     case STATE_PICKUP:
-      if (handlePickup()) {
+      if (handlePickupState()) {
         systemState = STATE_TRANSPORT;
         transportState = TRANSPORT_ROTATE_SERVO;
       }
       break;
-      
+
     case STATE_TRANSPORT:
-      if (handleTransport()) {
+      if (handleTransportState()) {
         systemState = STATE_DROPOFF;
         dropoffState = DROPOFF_LOWER_Z;
       }
       break;
-      
+
     case STATE_DROPOFF:
-      if (handleDropoff()) {
+      if (handleDropoffState()) {
         systemState = STATE_IDLE;  // Go idle and wait for next start command
         lastCycleEndTime = millis();  // Record end time to enforce inter-cycle delay
       }
@@ -222,11 +210,9 @@ void loop() {
   
   // Yield to other tasks to reduce CPU load
   delay(1);
-} 
+}
 
-//* ************************************************************************
-//* ************************ UTILITY FUNCTIONS ****************************
-//* ************************************************************************
+// Utility functions
 bool waitForTime(unsigned long duration) {
   if (stateTimer == 0) {
     stateTimer = millis();
@@ -241,9 +227,7 @@ bool waitForTime(unsigned long duration) {
   return false;
 }
 
-//* ************************************************************************
-//* ************************ SERIAL HANDLER *******************************
-//* ************************************************************************
+// Serial handler
 void handleSerial() {
   // This function can be used to handle serial commands for debugging
   // For example, trigger states, print status, etc.

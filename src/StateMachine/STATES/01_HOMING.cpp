@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <FastAccelStepper.h>
 #include "globals.h"
-#include "config/Pins_Definitions.h"
+#include "Config/Pins_Definitions.h"
 #include "ConfigApi/MachineSettings.h"
 
 // External references to objects defined in main file
@@ -33,7 +33,7 @@ extern int X_PICKUP_POS;
 // This state homes both Z and X axes sequentially
 // Z axis homes first, then moves up, then X axis homes and moves to pickup
 
-bool handleHoming() {
+bool handleHomingState() {
   static int homingStep = 0;
   static unsigned long zHomingStartTime = 0;
 

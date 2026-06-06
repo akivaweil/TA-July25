@@ -35,7 +35,7 @@ extern int Z_HOME_POS;
 // This state handles the pickup sequence:
 // Move X to pickup position, set servo, lower Z, activate vacuum, wait, raise Z
 
-bool handlePickup() {
+bool handlePickupState() {
   switch(pickupState) {
     case PICKUP_MOVE_X:
       if (xStepper) {

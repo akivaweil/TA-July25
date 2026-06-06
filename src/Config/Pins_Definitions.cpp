@@ -1,8 +1,6 @@
-#include "config/Pins_Definitions.h"
+#include "Config/Pins_Definitions.h"
 
-//* ************************************************************************
-//* ************************ PIN DEFINITIONS ******************************
-//* ************************************************************************
+// Pin definitions
 // Pin assignments for Freenove ESP32-S3 board
 // Updated to match original Transfer-Arm_TA-June25 project
 

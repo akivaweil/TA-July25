@@ -34,7 +34,7 @@ static bool servoRotatedEnRoute = false;
 // This state handles transporting the object from pickup to dropoff:
 // Rotate servo, move to overshoot, rotate servo again, move to dropoff
 
-bool handleTransport() {
+bool handleTransportState() {
   switch(transportState) {
     case TRANSPORT_ROTATE_SERVO:
       swivelArmServo.write(SERVO_TRAVEL_POS);

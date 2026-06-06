@@ -1,5 +1,4 @@
-#ifndef SERVO_CONTROL_H
-#define SERVO_CONTROL_H
+#pragma once
 
 #include <Arduino.h>
 
@@ -27,6 +26,4 @@ public:
     // Setters for customization
     void setPulseWidthRange(int minUs, int maxUs);
     void setAngleRange(int minDeg, int maxDeg);
-};
-
-#endif 
+}; 

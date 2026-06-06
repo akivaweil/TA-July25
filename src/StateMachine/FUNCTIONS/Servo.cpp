@@ -1,6 +1,4 @@
-//* ************************************************************************
-//* ************************ SERVO FUNCTIONS *******************************
-//* ************************************************************************
+// Servo functions
 // This file contains functions for controlling the servo motor using custom ServoControl class
 
 #include "ServoControl.h"
@@ -11,9 +9,7 @@
 // External reference to SERVO_HOME_POS from return home state
 extern int SERVO_HOME_POS;
 
-//* ************************************************************************
-//* ************************ SERVO SETUP ***********************************
-//* ************************************************************************
+// Servo setup
 void setupServo() {
   // Initialize servo with PWM channel 0
   swivelArmServo.init(SERVO_PIN, 0);

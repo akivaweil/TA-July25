@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 // GLOBAL CONFIGURATION
 // Mechanical settings used for step calculations across all states
@@ -29,5 +28,3 @@ extern int Z_ACCELERATION;     // Z acceleration (steps/sec²)
 
 // INPUT DEBOUNCE SETTINGS
 extern float Z_HOME_SWITCH_DEBOUNCE_MS;  // Z home switch debounce (ms)
-
-#endif

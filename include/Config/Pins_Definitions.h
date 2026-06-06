@@ -1,9 +1,6 @@
-#ifndef PINS_DEFINITIONS_H
-#define PINS_DEFINITIONS_H
+#pragma once
 
-//* ************************************************************************
-//* ************************ PIN DEFINITIONS ******************************
-//* ************************************************************************
+// Pin definitions
 // Pin assignments for Freenove ESP32 board
 // Updated to match original Transfer-Arm_TA-June25 project
 
@@ -24,6 +21,4 @@ extern int Z_DIR_PIN;           // Z-axis stepper motor direction pin
 // OUTPUT PINS - ACTUATORS
 extern int SERVO_PIN;           // Servo control pin
 extern int SOLENOID_RELAY_PIN;  // Solenoid relay control pin
-extern int STAGE2_SIGNAL_PIN;   // Signal output to Stage 2 machine (active high)
-
-#endif 
+extern int STAGE2_SIGNAL_PIN;   // Signal output to Stage 2 machine (active high) 

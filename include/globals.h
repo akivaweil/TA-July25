@@ -1,15 +1,12 @@
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#pragma once
 
 #include <Bounce2.h>
 #include <FastAccelStepper.h>
 #include "ServoControl.h"
-#include "config/Config.h"
-#include "config/Pins_Definitions.h"
+#include "Config/Config.h"
+#include "Config/Pins_Definitions.h"
 
-//* ************************************************************************
-//* ************************ BOUNCE2 OBJECTS ******************************
-//* ************************************************************************
+// Bounce2 objects
 // Bounce2 objects for debounced inputs
 extern Bounce xHomeSwitch;
 extern Bounce zHomeSwitch;
@@ -23,13 +20,11 @@ extern FastAccelStepper *zStepper;
 
 extern ServoControl swivelArmServo;
 
-//* ************************************************************************
-//* ************************ STATE DEFINITIONS *****************************
-//* ************************************************************************
+// State definitions
 enum SystemState {
   STATE_IDLE,
   STATE_PICKUP,
-  STATE_TRANSPORT, 
+  STATE_TRANSPORT,
   STATE_DROPOFF,
   STATE_HOMING
 };
@@ -64,30 +59,26 @@ enum DropoffState {
   DROPOFF_DONE
 };
 
-//* ************************************************************************
-//* ************************ STATE VARIABLES *******************************
-//* ************************************************************************
+// State variables
 extern SystemState systemState;
 extern PickupState pickupState;
 extern TransportState transportState;
 extern DropoffState dropoffState;
 extern bool vacuumActive;
 
-//* ************************************************************************
-//* ************************ FUNCTION DECLARATIONS *************************
-//* ************************************************************************
+// Function declarations
 // Hardware setup functions
 void setupPins();
-void setupSteppers(); 
+void setupSteppers();
 void setupServo();
 void setupDebouncers();
 
 // State handler functions
-bool handleHoming();
-bool handleIdle();
-bool handlePickup();
-bool handleTransport();
-bool handleDropoff();
+bool handleHomingState();
+bool handleIdleState();
+bool handlePickupState();
+bool handleTransportState();
+bool handleDropoffState();
 void handleSerial();
 
 // Utility functions
@@ -97,5 +88,3 @@ void activateVacuum();
 void deactivateVacuum();
 void enableXMotor();
 void disableXMotor();
-
-#endif 

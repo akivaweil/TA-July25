@@ -1,10 +1,8 @@
-#include "OTA_Upload.h"
+#include "OTA/OTA_Upload.h"
 #include <WiFi.h>
 #include <ArduinoOTA.h>
 
-//* ************************************************************************
-//* *********************** OTA UPLOAD IMPLEMENTATION *********************
-//* ************************************************************************
+// OTA upload implementation
 // Barebones WiFi connection and Over-The-Air updates for the ESP32.
 
 const char* ssid = "Everwood";
@@ -15,18 +13,21 @@ void setupOTA() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  // Try to connect for up to 30 seconds
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 30) {
-    delay(1000);
+  // Try to connect for a bounded time, then proceed regardless so the machine
+  // still boots and runs on its locally-saved settings if the network/TA is
+  // down. WiFi keeps retrying in the background after the loop falls through.
+  const uint32_t WIFI_CONNECT_TIMEOUT_MS = 15000;
+  const uint32_t WIFI_CONNECT_POLL_MS = 250;
+  WiFi.setAutoReconnect(true);
+  uint32_t wifiConnectStart = millis();
+  while (WiFi.status() != WL_CONNECTED &&
+         millis() - wifiConnectStart < WIFI_CONNECT_TIMEOUT_MS) {
+    delay(WIFI_CONNECT_POLL_MS);
     Serial.print(".");
-    attempts++;
   }
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("\nWiFi connection failed! Restarting...");
-    delay(2000);
-    ESP.restart();
+    Serial.println("\nWiFi unavailable — running standalone on saved settings.");
   }
 
   // Print IP address on startup
@@ -35,10 +36,8 @@ void setupOTA() {
   Serial.println(WiFi.localIP());
 
   ArduinoOTA.setHostname("stage1-esp32s3");
-  
-  //! ************************************************************************
-  //! STEP 1: SETUP PROGRESS CALLBACKS TO REDUCE LOGGING TO 25% INTERVALS
-  //! ************************************************************************
+
+  // STEP 1: Setup progress callbacks to reduce logging to 25% intervals
   ArduinoOTA.onStart([]() {
     Serial.println("OTA Update Started");
   });

@@ -1,4 +1,4 @@
-#include "config/Config.h"
+#include "Config/Config.h"
 
 // GLOBAL CONFIGURATION
 // Mechanical settings used for step calculations across all states

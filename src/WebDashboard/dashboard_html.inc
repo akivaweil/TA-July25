@@ -151,7 +151,7 @@ async function fetchJSON(url, opts) {
   } finally { clearTimeout(t); }
 }
 
-//* ******************** PANEL CONSTRUCTION ********************
+// Panel construction
 function buildPanel(m) {
   const s = ST[m.id] = { m, online:false, configLoaded:false, configLoading:false };
   const p = el("div", "panel offline"); s.panel = p;
@@ -189,7 +189,7 @@ function buildPanel(m) {
   return p;
 }
 
-//* ******************** TABS ********************
+// Tabs
 function setActive(id) {
   active = id;
   MACHINES.forEach(m => {
@@ -199,7 +199,7 @@ function setActive(id) {
   });
 }
 
-//* ******************** LIVE STATUS POLL ********************
+// Live status poll
 async function poll(m) {
   const s = ST[m.id];
   let r = null;
@@ -254,7 +254,7 @@ function setOffline(s) {
   s.fields.querySelectorAll("input").forEach(i => i.disabled = true);
 }
 
-//* ******************** CURATED SETTINGS ********************
+// Curated settings
 async function loadConfig(s) {
   s.configLoading = true;
   let r = null;
@@ -363,7 +363,7 @@ async function commitField(s, inp, stat, f) {
   }
 }
 
-//* ******************** HEADER SUMMARY ********************
+// Header summary
 function updateSummary() {
   const total = MACHINES.length;
   const online = MACHINES.filter(m => ST[m.id].online).length;
@@ -372,7 +372,7 @@ function updateSummary() {
   document.getElementById("sum-txt").textContent = online + " / " + total + " online";
 }
 
-//* ******************** BOOT + POLL LOOP ********************
+// Boot + poll loop
 const tabsEl = document.getElementById("tabs");
 const stage = document.getElementById("stage");
 MACHINES.forEach(m => {

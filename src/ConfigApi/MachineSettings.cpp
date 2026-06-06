@@ -1,4 +1,4 @@
-#include "MachineSettings.h"
+#include "ConfigApi/MachineSettings.h"
 #include <Arduino.h>
 #include <Preferences.h>
 #include <FastAccelStepper.h>
@@ -6,9 +6,7 @@
 
 // MACHINE SETTINGS IMPLEMENTATION
 
-//* ************************************************************************
-//* ******************** CURATED MUTABLE SETTINGS *************************
-//* ************************************************************************
+// Curated mutable settings
 // Single definitions (compile-time defaults match the original hardcoded values).
 float X_PICKUP_INCHES        = 0.2f;
 float Z_PICKUP_LOWER_INCHES  = 6.35f;
@@ -23,9 +21,7 @@ int   DROPOFF_SETTLE_TIME    = 25;
 int   Z_DROPOFF_SPEED        = 15000;
 // X_MAX_SPEED is defined in Config.cpp (kept at its existing home).
 
-//* ************************************************************************
-//* ******************** EXTERNS FROM THE REST OF THE FIRMWARE ************
-//* ************************************************************************
+// Externs from the rest of the firmware
 // Curated setting whose definition stays in Config.cpp.
 extern int X_MAX_SPEED;
 
@@ -53,9 +49,7 @@ extern const float X_OVERSHOOT_OFFSET_INCHES;       // 03_TRANSPORT.cpp
 extern const float X_SERVO_ROTATE_LEAD_INCHES;      // 03_TRANSPORT.cpp
 extern const float Z_EARLY_RETURN_INCHES;           // 04_DROPOFF.cpp
 
-//* ************************************************************************
-//* ******************** NVS PERSISTENCE *********************************
-//* ************************************************************************
+// NVS persistence
 static const char* NVS_NAMESPACE = "ta_config";
 static const uint32_t SETTINGS_MAGIC = 0x5441C0FE;  // "TA cofe" sentinel
 
@@ -121,9 +115,7 @@ void loadSettings() {
   prefs.end();
 }
 
-//* ************************************************************************
-//* ******************** APPLY (LIVE RUNTIME) ****************************
-//* ************************************************************************
+// Apply (live runtime)
 // Recomputes EVERY derived step position that the per-state init latches used
 // to compute once. Formulas are preserved EXACTLY from the original state code.
 void applyTASettings() {

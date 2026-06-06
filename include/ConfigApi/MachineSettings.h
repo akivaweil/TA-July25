@@ -1,5 +1,4 @@
-#ifndef MACHINE_SETTINGS_H
-#define MACHINE_SETTINGS_H
+#pragma once
 
 // MACHINE SETTINGS (NVS-backed curated config for the dashboard)
 // Owns the 12 curated, runtime-editable settings for the Transfer Arm (TA).
@@ -8,9 +7,7 @@
 // derived step position previously owned by the four per-state init latches,
 // and re-applies motor speeds. Persistence is NVS via Preferences ("ta_config").
 
-//* ************************************************************************
-//* ******************** CURATED MUTABLE SETTINGS *************************
-//* ************************************************************************
+// Curated mutable settings
 // These are the ONLY definitions of these symbols (state files now extern them).
 extern float X_PICKUP_INCHES;        // X pickup position (in)         [shared w/ homing]
 extern float Z_PICKUP_LOWER_INCHES;  // Lower Z for pickup (in)
@@ -26,9 +23,7 @@ extern int   DROPOFF_SETTLE_TIME;    // Settle time before raising Z (ms)
 // Config.cpp, Z_DROPOFF_SPEED is de-const'd and defined here.
 extern int   Z_DROPOFF_SPEED;        // Z speed for dropoff (steps/sec)[shared w/ transport]
 
-//* ************************************************************************
-//* ******************** PERSISTENCE / APPLY API **************************
-//* ************************************************************************
+// Persistence / apply API
 // Load persisted values from NVS into the curated globals (seeds defaults on
 // first boot via a magic sentinel and persists them).
 void loadSettings();
@@ -48,5 +43,3 @@ void persistSettingFloat(const char* nvsKey, float value);
 // Call once at boot (after steppers exist) and again whenever configDirty is
 // applied on entry to the motionless IDLE state.
 void applyTASettings();
-
-#endif // MACHINE_SETTINGS_H

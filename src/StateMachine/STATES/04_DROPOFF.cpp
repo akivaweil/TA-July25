@@ -44,7 +44,7 @@ extern int X_PICKUP_POS;
 // This state handles dropping off the object:
 // Check safety signal, lower Z, release vacuum, wait, raise Z with early X return
 
-bool handleDropoff() {
+bool handleDropoffState() {
   static bool zHomingOffsetPhase = false;
   static unsigned long zHomingStartTime = 0;
 
@@ -98,9 +98,7 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_RAISE_Z:
-      //! ************************************************************************
-      //! Z moved up enough - start X return AND Z homing in parallel (X does NOT home)
-      //! ************************************************************************
+      // Z moved up enough - start X return AND Z homing in parallel (X does NOT home)
       if (zStepper && zStepper->getCurrentPosition() <= Z_EARLY_RETURN_POS) {
         swivelArmServo.write(SERVO_HOME_POS);
         digitalWrite(STAGE2_SIGNAL_PIN, HIGH);
@@ -121,9 +119,7 @@ bool handleDropoff() {
       break;
       
     case DROPOFF_EARLY_RETURN:
-      //! ************************************************************************
-      //! Z homing: when switch hits, set pos 0 and move to offset; wait for both X and Z
-      //! ************************************************************************
+      // Z homing: when switch hits, set pos 0 and move to offset; wait for both X and Z
       if (!zHomingOffsetPhase) {
         if (zHomeSwitch.read() == HIGH || (millis() - zHomingStartTime) >= 5000) {
           if (zStepper) {
@@ -141,9 +137,7 @@ bool handleDropoff() {
       break;
 
     case DROPOFF_X_AT_PICKUP:
-      //! ************************************************************************
-      //! X reached pickup return position — now re-home X to correct any drift
-      //! ************************************************************************
+      // X reached pickup return position — now re-home X to correct any drift
       if (isMotorAtTarget(xStepper)) {
         digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
         if (xStepper) {
@@ -155,9 +149,7 @@ bool handleDropoff() {
       break;
 
     case DROPOFF_X_HOME:
-      //! ************************************************************************
-      //! Wait for X home switch, then zero position and move back to pickup
-      //! ************************************************************************
+      // Wait for X home switch, then zero position and move back to pickup
       if (digitalRead(X_HOME_SWITCH_PIN) == HIGH) {
         if (xStepper) {
           xStepper->forceStop();

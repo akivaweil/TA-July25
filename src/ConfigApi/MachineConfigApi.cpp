@@ -1,10 +1,11 @@
-#include "MachineConfigApi.h"
-#include "MachineSettings.h"
+#include "ConfigApi/MachineConfigApi.h"
+#include <Arduino.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
+#include "ConfigApi/MachineSettings.h"
 #include "globals.h"
-#include "config/Pins_Definitions.h"
+#include "Config/Pins_Definitions.h"
 
 // MACHINE CONFIG API IMPLEMENTATION
 
@@ -16,15 +17,11 @@ extern int X_MAX_SPEED;
 // Set by a deferred POST; main loop applies on next IDLE entry.
 volatile bool configDirty = false;
 
-//* ************************************************************************
-//* ******************** MACHINE IDENTITY ********************************
-//* ************************************************************************
+// Machine identity
 static const char* MACHINE_ID   = "ta";
 static const char* MACHINE_NAME = "Transfer Arm";
 
-//* ************************************************************************
-//* ******************** CURATED FIELD TABLE *****************************
-//* ************************************************************************
+// Curated field table
 // Self-describing settings. Each field points at its live global so the GET
 // reflects current values and the POST writes straight into runtime state.
 enum FieldType { FT_INT, FT_FLOAT };
@@ -64,9 +61,7 @@ static const Field* findField(const char* key) {
   return nullptr;
 }
 
-//* ************************************************************************
-//* ******************** STATE NAME / HEALTH *****************************
-//* ************************************************************************
+// State name / health
 static const char* stateName() {
   switch (systemState) {
     case STATE_IDLE:      return "IDLE";
@@ -85,9 +80,7 @@ bool isSafeToApplyConfig() {
   return systemState == STATE_IDLE;
 }
 
-//* ************************************************************************
-//* ******************** STATUS JSON *************************************
-//* ************************************************************************
+// Status JSON
 String buildStatusJson() {
   JsonDocument doc;
   doc["id"]       = MACHINE_ID;
@@ -112,9 +105,7 @@ String buildStatusJson() {
   return out;
 }
 
-//* ************************************************************************
-//* ******************** CONFIG JSON (GET) *******************************
-//* ************************************************************************
+// Config JSON (GET)
 String buildConfigJson() {
   JsonDocument doc;
   doc["id"]     = MACHINE_ID;
@@ -143,9 +134,7 @@ String buildConfigJson() {
   return out;
 }
 
-//* ************************************************************************
-//* ******************** CONFIG POST CORE ********************************
-//* ************************************************************************
+// Config POST core
 // Returns true on success (HTTP 200). On false, outMsg holds the error and
 // NOTHING is changed/persisted. On success, outDeferred reflects apply vs defer.
 bool applyConfigJson(const String& body, bool& outDeferred, String& outMsg) {
@@ -225,9 +214,7 @@ bool applyConfigJson(const String& body, bool& outDeferred, String& outMsg) {
   return true;
 }
 
-//* ************************************************************************
-//* ******************** ROUTE REGISTRATION ******************************
-//* ************************************************************************
+// Route registration
 static void addCors(AsyncWebServerResponse* res) {
   res->addHeader("Access-Control-Allow-Origin", "*");
 }
@@ -313,9 +300,7 @@ void setupConfigApi(AsyncWebServer& server) {
   });
 }
 
-//* ************************************************************************
-//* ******************** GLOBAL ASYNC SERVER *****************************
-//* ************************************************************************
+// Global async server
 // Single AsyncWebServer on port 80. begin() only after WiFi is up (caller
 // guarantees this by calling setupWebServer() after setupOTA()).
 static AsyncWebServer webServer(80);
