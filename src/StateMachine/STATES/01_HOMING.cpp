@@ -8,9 +8,7 @@ extern FastAccelStepper *xStepper;
 extern FastAccelStepper *zStepper;
 extern Bounce zHomeSwitch;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🏠 HOMING STATE CONFIG                                                 ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// HOMING STATE CONFIG
 // Position settings (inches)
 const float Z_HOME_OFFSET_INCHES = 0.3;      // Move Z away from home after homing
 
@@ -32,9 +30,7 @@ int Z_HOME_POS = 0;            // Will be calculated on first call
 static int xPickupPosHoming = 0;  // Local copy so homing can move to pickup even before pickup state runs
 static bool homingConfigInitialized = false;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🏠 HOMING STATE                                                        ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// HOMING STATE
 // This state homes both Z and X axes sequentially
 // Z axis homes first, then moves up, then X axis homes and moves to pickup
 

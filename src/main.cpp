@@ -144,8 +144,8 @@ void setupSteppers() {
 //* ************************ MAIN LOOP - STATE MACHINE ********************
 //* ************************************************************************
 void loop() {
-  // Only accept OTA uploads while in IDLE state
-  if (systemState == STATE_IDLE) {
+  // Only accept OTA uploads while in IDLE or HOMING state
+  if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
     handleOTA();
   }
   

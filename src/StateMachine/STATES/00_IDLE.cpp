@@ -5,15 +5,11 @@
 extern unsigned long stateTimer;
 extern unsigned long lastCycleEndTime;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ ⏸️  IDLE STATE CONFIG                                                  ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// IDLE STATE CONFIG
 const int START_SIGNAL_DELAY = 325;              // Delay after start signal before beginning pick cycle (ms)
 const unsigned long MIN_CYCLE_INTERVAL_MS = 2000; // Minimum time between consecutive cycles to avoid slamming Stage 2
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ ⏸️  IDLE STATE                                                         ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// IDLE STATE
 // This state waits for trigger signals (start button or stage1 signal)
 // When triggered, waits for START_SIGNAL_DELAY before transitioning to pickup sequence
 // Also enforces a minimum interval between consecutive cycles

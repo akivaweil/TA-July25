@@ -11,9 +11,7 @@ extern unsigned long stateTimer;
 extern bool vacuumActive;
 extern float STEPS_PER_INCH;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 📦 PICKUP STATE CONFIG                                                 ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// PICKUP STATE CONFIG
 // Position settings (inches)
 extern const float X_PICKUP_INCHES = 0.2;    // X pickup position (shared with homing)
 const float Z_PICKUP_LOWER_INCHES = 6.35;    // Lower Z for pickup
@@ -41,9 +39,7 @@ extern int Z_HOME_POS;
 // External travel servo position from transport state
 extern const int SERVO_TRAVEL_POS;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 📦 PICKUP STATE                                                        ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// PICKUP STATE
 // This state handles the pickup sequence:
 // Move X to pickup position, set servo, lower Z, activate vacuum, wait, raise Z
 

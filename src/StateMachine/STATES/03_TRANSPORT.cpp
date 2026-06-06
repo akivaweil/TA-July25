@@ -15,9 +15,7 @@ extern int Z_DROPOFF_POS;
 extern const int Z_DROPOFF_SPEED;
 extern const float Z_DROPOFF_LOWER_INCHES;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🚚 TRANSPORT STATE CONFIG                                              ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// TRANSPORT STATE CONFIG
 // Position settings (inches)
 const float X_DROPOFF_INCHES = 20.75;                             // X dropoff position
 const float X_OVERSHOOT_INCHES = (X_DROPOFF_INCHES + 2.3);       // 2.3" past dropoff for servo rotation
@@ -26,7 +24,7 @@ const float X_SERVO_ROTATE_INCHES = (X_DROPOFF_INCHES - X_SERVO_ROTATE_LEAD_INCH
 
 // Servo settings (degrees)
 extern const int SERVO_TRAVEL_POS = 32;      // Travel position (shared with pickup)
-const int SERVO_DROPOFF_POS = 110;    // Dropoff orientation (higher is more clockwise)
+const int SERVO_DROPOFF_POS = 113;    // Dropoff orientation (higher is more clockwise)
 
 // Calculated positions (steps) - initialized at runtime
 int X_DROPOFF_POS = 0;
@@ -35,9 +33,7 @@ int X_SERVO_ROTATE_POS = 0;
 static bool transportConfigInitialized = false;
 static bool servoRotatedEnRoute = false;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 🚚 TRANSPORT STATE                                                     ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// TRANSPORT STATE
 // This state handles transporting the object from pickup to dropoff:
 // Rotate servo, move to overshoot, rotate servo again, move to dropoff
 

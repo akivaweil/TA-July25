@@ -12,9 +12,7 @@ extern Bounce zHomeSwitch;
 extern ServoControl swivelArmServo;
 extern float STEPS_PER_INCH;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 📤 DROPOFF STATE CONFIG                                                ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// DROPOFF STATE CONFIG
 // Position settings (inches)
 extern const float Z_DROPOFF_LOWER_INCHES = 6.65;    // Lower Z for dropoff (shared with transport)
 const float Z_EARLY_RETURN_INCHES = 2.0;             // Z distance to travel up before starting X return home
@@ -45,9 +43,7 @@ extern int X_PICKUP_POS;
 // Servo neutral/home position (degrees)
 int SERVO_HOME_POS = 52;
 
-//╔═══╗ ════════════════════════════════════════════════════════════════ ╔═══╗
-//║ 📤 DROPOFF STATE                                                       ║
-//╚═══╝ ════════════════════════════════════════════════════════════════ ╚═══╝
+// DROPOFF STATE
 // This state handles dropping off the object:
 // Check safety signal, lower Z, release vacuum, wait, raise Z with early X return
 
