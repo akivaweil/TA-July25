@@ -120,7 +120,9 @@ Build responses with a `JsonDocument` + `serializeJson(doc, out)`. Parse the POS
 ## Machine table (used by the TA dashboard SPA only)
 | id | name | base URL |
 |----|------|----------|
-| `ta` | Transfer Arm | (same origin — empty base) |
-| `stage1` | Stage 1 | `http://192.168.1.250` |
-| `router` | Router | `http://192.168.1.249` |
-| `stage2` | Stage 2 | `http://192.168.1.251` |
+| `ta` | Transfer Arm | (same origin — empty base; device is `192.168.1.228`) |
+| `stage1` | Stage 1 | `http://192.168.1.251` |
+| `router` | Router | `http://192.168.1.250` |
+| `stage2` | Stage 2 | `http://192.168.1.253` |
+
+> The TA repo builds and OTA-flashes all four machines; upload targets live in `platformio.ini`.

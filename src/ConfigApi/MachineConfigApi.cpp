@@ -5,14 +5,22 @@
 #include <WiFi.h>
 #include "ConfigApi/MachineSettings.h"
 #include "globals.h"
+#include "Config/Config.h"
 #include "Config/Pins_Definitions.h"
 
 // MACHINE CONFIG API IMPLEMENTATION
 
 extern const char DASHBOARD_HTML[] PROGMEM;  // src/WebDashboard/dashboard_html.inc
 
-// Curated setting whose definition stays in Config.cpp.
+// Curated motor settings whose definitions stay in Config.cpp. (Also declared in
+// Config.h, included below — re-declared here for locality with the field table.)
 extern int X_MAX_SPEED;
+extern int X_ACCELERATION;
+extern int Z_MAX_SPEED;
+extern int Z_ACCELERATION;
+
+// Mechanical scaling — lets the dashboard show step-based speeds in inches/sec.
+extern float STEPS_PER_INCH;
 
 // Set by a deferred POST; main loop applies on next IDLE entry.
 volatile bool configDirty = false;
@@ -29,6 +37,7 @@ enum FieldType { FT_INT, FT_FLOAT };
 struct Field {
   const char* key;
   const char* label;
+  const char* group;    // dashboard section heading (state / activity)
   FieldType   type;
   float       minV;
   float       maxV;
@@ -36,21 +45,32 @@ struct Field {
   int*        iPtr;     // valid when type == FT_INT
   float*      fPtr;     // valid when type == FT_FLOAT
   const char* nvsKey;   // NVS key used by MachineSettings persistence
+  bool        fromSteps;  // stored in steps; dashboard shows/edits it in inches/sec (÷ STEPS_PER_INCH)
+  bool        collapsed;  // dashboard collapses this field's section by default
 };
 
+// Fields are grouped by the state/activity that consumes them. The dashboard
+// renders one collapsible section per "group", in first-appearance order; a
+// group whose first field has collapsed=true starts collapsed. Motor speeds and
+// accelerations are stored in steps (st/s, st/s²) but flagged fromSteps so the
+// dashboard presents them in inches/sec — the POST still sends steps, so the
+// firmware/NVS contract is unchanged.
 static const Field FIELDS[] = {
-  { "X_PICKUP_INCHES",       "X Pickup (in)",        FT_FLOAT, 0.1f,  5.0f,   0.05f, nullptr, &X_PICKUP_INCHES,        "xPickIn" },
-  { "Z_PICKUP_LOWER_INCHES", "Z Pickup Lower (in)",  FT_FLOAT, 3.0f,  10.0f,  0.1f,  nullptr, &Z_PICKUP_LOWER_INCHES,  "zPickLowIn" },
-  { "SERVO_PICKUP_POS",      "Servo Pickup (deg)",   FT_INT,   0,     180,    1,     &SERVO_PICKUP_POS, nullptr,        "servoPick" },
-  { "PICKUP_HOLD_TIME",      "Pickup Hold (ms)",     FT_INT,   10,    500,    10,    &PICKUP_HOLD_TIME, nullptr,        "pickHold" },
-  { "X_DROPOFF_INCHES",      "X Dropoff (in)",       FT_FLOAT, 15.0f, 30.0f,  0.25f, nullptr, &X_DROPOFF_INCHES,       "xDropIn" },
-  { "SERVO_TRAVEL_POS",      "Servo Travel (deg)",   FT_INT,   0,     180,    1,     &SERVO_TRAVEL_POS, nullptr,        "servoTravel" },
-  { "SERVO_DROPOFF_POS",     "Servo Dropoff (deg)",  FT_INT,   0,     180,    1,     &SERVO_DROPOFF_POS, nullptr,       "servoDrop" },
-  { "Z_DROPOFF_LOWER_INCHES","Z Dropoff Lower (in)", FT_FLOAT, 3.0f,  10.0f,  0.1f,  nullptr, &Z_DROPOFF_LOWER_INCHES, "zDropLowIn" },
-  { "SERVO_HOME_POS",        "Servo Home (deg)",     FT_INT,   0,     180,    1,     &SERVO_HOME_POS, nullptr,         "servoHome" },
-  { "DROPOFF_SETTLE_TIME",   "Dropoff Settle (ms)",  FT_INT,   10,    200,    5,     &DROPOFF_SETTLE_TIME, nullptr,     "dropSettle" },
-  { "X_MAX_SPEED",           "X Max Speed (st/s)",   FT_INT,   1000,  15000,  100,   &X_MAX_SPEED, nullptr,            "xMaxSpeed" },
-  { "Z_DROPOFF_SPEED",       "Z Dropoff Speed (st/s)",FT_INT,  5000,  20000,  500,   &Z_DROPOFF_SPEED, nullptr,        "zDropSpeed" },
+  { "X_PICKUP_INCHES",       "X Pickup (in)",         "Pickup",     FT_FLOAT, 0.1f,  5.0f,   0.05f, nullptr, &X_PICKUP_INCHES,        "xPickIn",     false, false },
+  { "Z_PICKUP_LOWER_INCHES", "Z Pickup Lower (in)",   "Pickup",     FT_FLOAT, 3.0f,  10.0f,  0.1f,  nullptr, &Z_PICKUP_LOWER_INCHES,  "zPickLowIn",  false, false },
+  { "SERVO_PICKUP_POS",      "Servo Pickup (deg)",    "Pickup",     FT_INT,   0,     180,    1,     &SERVO_PICKUP_POS, nullptr,        "servoPick",   false, false },
+  { "PICKUP_HOLD_TIME",      "Pickup Hold (ms)",      "Pickup",     FT_INT,   10,    500,    10,    &PICKUP_HOLD_TIME, nullptr,        "pickHold",    false, false },
+  { "X_DROPOFF_INCHES",      "X Dropoff (in)",        "Transport",  FT_FLOAT, 15.0f, 30.0f,  0.25f, nullptr, &X_DROPOFF_INCHES,       "xDropIn",     false, false },
+  { "SERVO_TRAVEL_POS",      "Servo Travel (deg)",    "Transport",  FT_INT,   0,     180,    1,     &SERVO_TRAVEL_POS, nullptr,        "servoTravel", false, false },
+  { "SERVO_DROPOFF_POS",     "Servo Dropoff (deg)",   "Dropoff",    FT_INT,   0,     180,    1,     &SERVO_DROPOFF_POS, nullptr,       "servoDrop",   false, false },
+  { "Z_DROPOFF_LOWER_INCHES","Z Dropoff Lower (in)",  "Dropoff",    FT_FLOAT, 3.0f,  10.0f,  0.1f,  nullptr, &Z_DROPOFF_LOWER_INCHES, "zDropLowIn",  false, false },
+  { "DROPOFF_SETTLE_TIME",   "Dropoff Settle (ms)",   "Dropoff",    FT_INT,   10,    200,    5,     &DROPOFF_SETTLE_TIME, nullptr,     "dropSettle",  false, false },
+  { "Z_DROPOFF_SPEED",       "Z Dropoff Speed (in/s)","Dropoff",    FT_INT,   5000,  20000,  500,   &Z_DROPOFF_SPEED, nullptr,        "zDropSpeed",  true,  false },
+  { "SERVO_HOME_POS",        "Servo Home (deg)",      "Return Home",FT_INT,   0,     180,    1,     &SERVO_HOME_POS, nullptr,         "servoHome",   false, false },
+  { "X_MAX_SPEED",           "X Speed (in/s)",        "Motors",     FT_INT,   1000,  15000,  100,   &X_MAX_SPEED, nullptr,            "xMaxSpeed",   true,  true },
+  { "X_ACCELERATION",        "X Accel (in/s²)",       "Motors",     FT_INT,   1000,  50000,  500,   &X_ACCELERATION, nullptr,         "xAccel",      true,  true },
+  { "Z_MAX_SPEED",           "Z Speed (in/s)",        "Motors",     FT_INT,   1000,  20000,  100,   &Z_MAX_SPEED, nullptr,            "zMaxSpeed",   true,  true },
+  { "Z_ACCELERATION",        "Z Accel (in/s²)",       "Motors",     FT_INT,   1000,  50000,  500,   &Z_ACCELERATION, nullptr,         "zAccel",      true,  true },
 };
 static const size_t FIELD_COUNT = sizeof(FIELDS) / sizeof(FIELDS[0]);
 
@@ -80,6 +100,16 @@ bool isSafeToApplyConfig() {
   return systemState == STATE_IDLE;
 }
 
+// Map WiFi RSSI to a simple 1–10 link score for the dashboard (0 = disconnected).
+static int wifiLinkScore() {
+  if (WiFi.status() != WL_CONNECTED) return 0;
+  int rssi = WiFi.RSSI();
+  if (rssi >= WIFI_RSSI_BEST_DBM) return 10;
+  if (rssi <= WIFI_RSSI_WORST_DBM) return 1;
+  int span = WIFI_RSSI_BEST_DBM - WIFI_RSSI_WORST_DBM;  // dBm range spanning scores 1..10
+  return 1 + (9 * (rssi - WIFI_RSSI_WORST_DBM) + span / 2) / span;  // linear, rounded
+}
+
 // Status JSON
 String buildStatusJson() {
   JsonDocument doc;
@@ -88,9 +118,8 @@ String buildStatusJson() {
   doc["state"]    = stateName();
   // WARNING until first homing completes (i.e. while still homing), else HEALTHY.
   doc["health"]   = (systemState == STATE_HOMING) ? "WARNING" : "HEALTHY";
-  doc["uptimeMs"] = (uint32_t)millis();
-  doc["freeHeap"] = (uint32_t)ESP.getFreeHeap();
-  doc["rssi"]     = (WiFi.status() == WL_CONNECTED) ? WiFi.RSSI() : 0;
+  doc["uptimeMs"]  = (uint32_t)millis();
+  doc["wifiScore"] = wifiLinkScore();  // 0 = disconnected, else 1–10
 
   JsonObject sensors = doc["sensors"].to<JsonObject>();
   sensors["xHome"]       = (digitalRead(X_HOME_SWITCH_PIN) == HIGH);
@@ -110,12 +139,15 @@ String buildConfigJson() {
   JsonDocument doc;
   doc["id"]     = MACHINE_ID;
   doc["schema"] = 1;
+  // Steps-per-inch lets the dashboard render/edit fromSteps fields in inches/sec.
+  doc["stepsPerInch"] = STEPS_PER_INCH;
   JsonArray fields = doc["fields"].to<JsonArray>();
   for (size_t i = 0; i < FIELD_COUNT; i++) {
     const Field& f = FIELDS[i];
     JsonObject o = fields.add<JsonObject>();
     o["key"]   = f.key;
     o["label"] = f.label;
+    o["group"] = f.group;
     o["type"]  = (f.type == FT_INT) ? "int" : "float";
     if (f.type == FT_INT) {
       o["value"] = *f.iPtr;
@@ -128,6 +160,8 @@ String buildConfigJson() {
       o["min"]   = f.minV;
       o["max"]   = f.maxV;
     }
+    if (f.fromSteps) o["fromSteps"] = true;  // dashboard shows this field in inches/sec
+    if (f.collapsed) o["collapsed"] = true;  // dashboard collapses its section by default
   }
   String out;
   serializeJson(doc, out);
@@ -183,6 +217,15 @@ bool applyConfigJson(const String& body, bool& outDeferred, String& outMsg) {
   const bool safe = isSafeToApplyConfig();
 
   if (safe) {
+    // Drain any previously-deferred values from NVS into the live globals FIRST.
+    // A prior deferred POST persisted new values but left the live globals stale;
+    // without this, the saveSettings() below (which rewrites ALL globals) would
+    // flush those stale globals back over the deferred values and lose them.
+    if (configDirty) {
+      loadSettings();      // pull persisted (incl. the deferred change) -> live
+      applyTASettings();
+      configDirty = false;
+    }
     // SAFE PATH: write live globals, persist them, then recompute derived state.
     for (JsonPair kv : obj) {
       const Field* f = findField(kv.key().c_str());

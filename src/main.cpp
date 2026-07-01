@@ -8,6 +8,13 @@
 #include "ConfigApi/MachineConfigApi.h"
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+#include "esp_task_wdt.h"
+
+// Task watchdog timeout (seconds): if the loop task (state machine) stalls for
+// longer than this, the chip resets instead of hanging. Generous enough never to
+// trip on a legitimate operation; the loop is fed every iteration (and during an
+// OTA upload via the progress callback).
+const uint32_t WATCHDOG_TIMEOUT_S = 15;
 
 // Function declarations
 void setupPins();
@@ -52,6 +59,7 @@ bool vacuumActive = false;
 void setup() {
   // Initialize Serial communication
   Serial.begin(115200);
+  Serial.println("[TA] booting");
   delay(100);
   
   // Initialize OTA functionality (connects WiFi)
@@ -78,7 +86,16 @@ void setup() {
   // Apply settings + recompute all derived step positions now that steppers exist
   applyTASettings();
 
+  // Subscribe the loop task to the task watchdog. Added last so the boot-time
+  // WiFi connect (bounded 15s) isn't watched. esp_task_wdt_init() reconfigures
+  // the core's already-running TWDT to our timeout; add(NULL) watches this (loop)
+  // task. The loop feeds it each iteration.
+  esp_task_wdt_init(WATCHDOG_TIMEOUT_S, true);
+  esp_task_wdt_add(NULL);
+
   systemState = STATE_HOMING;
+
+  Serial.println("[TA] ready");
 }
 
 // Setup functions
@@ -102,21 +119,23 @@ void setupPins() {
 }
 
 void setupDebouncers() {
-  // X-axis: no debounce - direct read
-  
+  // X-axis: debounce for reliable homing (mirrors Z)
+  xHomeSwitch.attach(X_HOME_SWITCH_PIN);
+  xHomeSwitch.interval(X_HOME_SWITCH_DEBOUNCE_MS);
+
   // Z-axis: debounce for reliable homing
   zHomeSwitch.attach(Z_HOME_SWITCH_PIN);
   zHomeSwitch.interval((uint16_t)Z_HOME_SWITCH_DEBOUNCE_MS);
-  
-  // Configure input signals with 10ms debounce
+
+  // Configure input signals with debounce
   startButton.attach(START_BUTTON_PIN);
-  startButton.interval(10);  // 10ms debounce
-  
+  startButton.interval(INPUT_DEBOUNCE_MS);
+
   stage1Signal.attach(STAGE1_SIGNAL_PIN);
-  stage1Signal.interval(10);  // 10ms debounce
-  
+  stage1Signal.interval(INPUT_DEBOUNCE_MS);
+
   stopSignalStage2.attach(STOP_SIGNAL_STAGE_2);
-  stopSignalStage2.interval(10);  // 10ms debounce
+  stopSignalStage2.interval(INPUT_DEBOUNCE_MS);
 }
 
 void setupSteppers() {
@@ -143,6 +162,9 @@ void setupSteppers() {
 
 // Main loop - state machine
 void loop() {
+  // Feed the task watchdog each iteration.
+  esp_task_wdt_reset();
+
   // Only accept OTA uploads while in IDLE or HOMING state
   if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
     handleOTA();
@@ -160,6 +182,7 @@ void loop() {
   }
   
   // Update all debouncers first
+  xHomeSwitch.update();
   zHomeSwitch.update();
   startButton.update();
   stage1Signal.update();

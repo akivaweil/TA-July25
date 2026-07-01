@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <Preferences.h>
 #include <FastAccelStepper.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 #include "globals.h"
 
 // MACHINE SETTINGS IMPLEMENTATION
@@ -22,8 +24,11 @@ int   Z_DROPOFF_SPEED        = 15000;
 // X_MAX_SPEED is defined in Config.cpp (kept at its existing home).
 
 // Externs from the rest of the firmware
-// Curated setting whose definition stays in Config.cpp.
+// Curated motor settings whose definitions stay in Config.cpp.
 extern int X_MAX_SPEED;
+extern int X_ACCELERATION;
+extern int Z_MAX_SPEED;
+extern int Z_ACCELERATION;
 
 // Mechanical scaling.
 extern float STEPS_PER_INCH;
@@ -55,7 +60,19 @@ static const uint32_t SETTINGS_MAGIC = 0x5441C0FE;  // "TA cofe" sentinel
 
 static Preferences prefs;
 
+// All NVS access is serialized through this recursive mutex. The config POST
+// handler runs on the AsyncTCP task while loadSettings() runs on the loop task,
+// and the shared Preferences object is not thread-safe (begin/end mutate a single
+// handle — concurrent use drops writes or reads garbage). Recursive so that
+// loadSettings()'s first-boot path can call saveSettings() while already held.
+static SemaphoreHandle_t prefsMutex() {
+  static SemaphoreHandle_t m = xSemaphoreCreateRecursiveMutex();
+  return m;
+}
+
 void saveSettings() {
+  SemaphoreHandle_t m = prefsMutex();
+  if (m) xSemaphoreTakeRecursive(m, portMAX_DELAY);
   prefs.begin(NVS_NAMESPACE, false);
   prefs.putFloat("xPickIn", X_PICKUP_INCHES);
   prefs.putFloat("zPickLowIn", Z_PICKUP_LOWER_INCHES);
@@ -68,9 +85,13 @@ void saveSettings() {
   prefs.putInt("servoHome", SERVO_HOME_POS);
   prefs.putInt("dropSettle", DROPOFF_SETTLE_TIME);
   prefs.putInt("xMaxSpeed", X_MAX_SPEED);
+  prefs.putInt("xAccel", X_ACCELERATION);
+  prefs.putInt("zMaxSpeed", Z_MAX_SPEED);
+  prefs.putInt("zAccel", Z_ACCELERATION);
   prefs.putInt("zDropSpeed", Z_DROPOFF_SPEED);
   prefs.putUInt("magic", SETTINGS_MAGIC);
   prefs.end();
+  if (m) xSemaphoreGiveRecursive(m);
 }
 
 // Persist a SINGLE curated value straight to NVS without touching any live
@@ -80,24 +101,33 @@ void saveSettings() {
 // sentinel is already present (written at boot), so loadSettings() will read
 // these new keys back.
 void persistSettingInt(const char* nvsKey, int value) {
+  SemaphoreHandle_t m = prefsMutex();
+  if (m) xSemaphoreTakeRecursive(m, portMAX_DELAY);
   prefs.begin(NVS_NAMESPACE, false);
   prefs.putInt(nvsKey, value);
   prefs.end();
+  if (m) xSemaphoreGiveRecursive(m);
 }
 
 void persistSettingFloat(const char* nvsKey, float value) {
+  SemaphoreHandle_t m = prefsMutex();
+  if (m) xSemaphoreTakeRecursive(m, portMAX_DELAY);
   prefs.begin(NVS_NAMESPACE, false);
   prefs.putFloat(nvsKey, value);
   prefs.end();
+  if (m) xSemaphoreGiveRecursive(m);
 }
 
 void loadSettings() {
+  SemaphoreHandle_t m = prefsMutex();
+  if (m) xSemaphoreTakeRecursive(m, portMAX_DELAY);
   prefs.begin(NVS_NAMESPACE, true);  // read-only
   uint32_t magic = prefs.getUInt("magic", 0);
   if (magic != SETTINGS_MAGIC) {
     // First boot: keep compile-time defaults and persist them.
     prefs.end();
-    saveSettings();
+    saveSettings();  // recursive take inside — safe while already held
+    if (m) xSemaphoreGiveRecursive(m);
     return;
   }
   X_PICKUP_INCHES        = prefs.getFloat("xPickIn", X_PICKUP_INCHES);
@@ -111,8 +141,12 @@ void loadSettings() {
   SERVO_HOME_POS         = prefs.getInt("servoHome", SERVO_HOME_POS);
   DROPOFF_SETTLE_TIME    = prefs.getInt("dropSettle", DROPOFF_SETTLE_TIME);
   X_MAX_SPEED            = prefs.getInt("xMaxSpeed", X_MAX_SPEED);
+  X_ACCELERATION         = prefs.getInt("xAccel", X_ACCELERATION);
+  Z_MAX_SPEED            = prefs.getInt("zMaxSpeed", Z_MAX_SPEED);
+  Z_ACCELERATION         = prefs.getInt("zAccel", Z_ACCELERATION);
   Z_DROPOFF_SPEED        = prefs.getInt("zDropSpeed", Z_DROPOFF_SPEED);
   prefs.end();
+  if (m) xSemaphoreGiveRecursive(m);
 }
 
 // Apply (live runtime)
@@ -129,7 +163,12 @@ void applyTASettings() {
   Z_PICKUP_POS         = (int)(Z_PICKUP_LOWER_INCHES * STEPS_PER_INCH);
   Z_SUCTION_START_POS  = (int)(Z_SUCTION_START_INCHES * STEPS_PER_INCH);
   Z_TRANSPORT_RAISE_POS = Z_HOME_POS + (int)(Z_TRANSPORT_RAISE_OFFSET_INCHES * STEPS_PER_INCH);
-  Z_SERVO_ROTATE_POS   = (2 * Z_PICKUP_POS + Z_TRANSPORT_RAISE_POS) / 3;
+  // Servo-rotate height = one-third of the way from the pickup (low) position up
+  // toward the transport-raise (high) position, i.e. a weighted average biased
+  // 2:1 toward pickup. ROTATE_SPLIT_DIVISOR is the denominator of that thirds
+  // split (2*pickup + raise) / 3.
+  const int Z_SERVO_ROTATE_SPLIT_DIVISOR = 3;
+  Z_SERVO_ROTATE_POS   = (2 * Z_PICKUP_POS + Z_TRANSPORT_RAISE_POS) / Z_SERVO_ROTATE_SPLIT_DIVISOR;
 
   // --- Transport (was 03_TRANSPORT.cpp transportConfigInitialized) ---
   X_DROPOFF_POS       = (int)(X_DROPOFF_INCHES * STEPS_PER_INCH);
@@ -140,9 +179,18 @@ void applyTASettings() {
   Z_DROPOFF_POS       = (int)(Z_DROPOFF_LOWER_INCHES * STEPS_PER_INCH);
   Z_EARLY_RETURN_POS  = (int)(Z_EARLY_RETURN_INCHES * STEPS_PER_INCH);
 
-  // --- Re-apply motor speeds ---
+  // --- Re-apply motor speeds + accelerations ---
+  // Runs only at IDLE (callers guarantee this), so the steppers are stopped and
+  // these just set the base values used by the next move. The cycle states
+  // temporarily override speed for homing/dropoff seeks and then reset to
+  // X_MAX_SPEED / Z_MAX_SPEED, so updating those live globals here is enough.
   if (xStepper) {
     xStepper->setSpeedInHz(X_MAX_SPEED);
+    xStepper->setAcceleration(X_ACCELERATION);
+  }
+  if (zStepper) {
+    zStepper->setSpeedInHz(Z_MAX_SPEED);
+    zStepper->setAcceleration(Z_ACCELERATION);
   }
   // Z_DROPOFF_SPEED is applied on demand at the moment of the dropoff move; the
   // state code reads the live global, so no persistent re-apply is required here.

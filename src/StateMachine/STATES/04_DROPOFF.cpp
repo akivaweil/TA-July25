@@ -22,9 +22,15 @@ extern const float Z_EARLY_RETURN_INCHES = 2.0;      // Z distance to travel up 
 
 // Timing settings (ms)
 const int DROPOFF_HOLD_TIME = 10;     // Hold time at dropoff position
+const unsigned long DROPOFF_VACUUM_RELEASE_DELAY_MS = 50;  // Settle time after vacuum off before release
+
+// Position tolerance (steps) for the post-move dropoff-position verification.
+const int DROPOFF_POSITION_TOLERANCE_STEPS = 10;
 
 // Speed settings
-const int Z_HOME_SPEED = 450;         // Z homing speed during X return
+// Z_HOME_SPEED is defined once in 01_HOMING.cpp; referenced here via extern so
+// the value lives in a single place (unchanged at 450 steps/sec).
+extern const int Z_HOME_SPEED;        // Z homing speed during X return
 
 // Calculated positions (steps) - maintained by applyTASettings()
 int Z_DROPOFF_POS = 0;
@@ -64,7 +70,7 @@ bool handleDropoffState() {
       // Wait for Z to fully reach dropoff position before proceeding
       if (isMotorAtTarget(zStepper)) {
         // Additional verification: ensure we're actually at the dropoff position
-        if (zStepper && abs(zStepper->getCurrentPosition() - Z_DROPOFF_POS) <= 10) {
+        if (zStepper && abs(zStepper->getCurrentPosition() - Z_DROPOFF_POS) <= DROPOFF_POSITION_TOLERANCE_STEPS) {
           deactivateVacuum();
           dropoffState = DROPOFF_VACUUM_DELAY;
         }
@@ -72,7 +78,7 @@ bool handleDropoffState() {
       break;
       
     case DROPOFF_VACUUM_DELAY:
-      if (waitForTime(50)) {
+      if (waitForTime(DROPOFF_VACUUM_RELEASE_DELAY_MS)) {
         dropoffState = DROPOFF_RELEASE;
       }
       break;

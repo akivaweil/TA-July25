@@ -1,26 +1,22 @@
 // This file will contain functions for controlling the stepper motors.
 #include "globals.h"
+#include <stdlib.h>
+
+// "At target" tolerance (steps). A normally completed moveTo() ends exactly at
+// targetPos(), so this is satisfied with margin to spare; it only rejects the
+// case where the motor stopped short (e.g. force-stopped) of its commanded
+// target, which must NOT be reported as "reached".
+const int32_t MOTOR_AT_TARGET_TOLERANCE_STEPS = 5;
 
 bool isMotorAtTarget(FastAccelStepper* motor) {
   if (!motor) return true;
-  
-  // Check if motor is running
+
+  // Still moving: not there yet.
   if (motor->isRunning()) return false;
-  
-  // Since FastAccelStepper doesn't have getTargetPosition(),
-  // we'll use a simpler approach: just check if motor is not running
-  // The motor will stop when it reaches the target position
-  return true;
-}
 
-void enableXMotor() {
-  if (xStepper) {
-    xStepper->enableOutputs();
-  }
-}
-
-void disableXMotor() {
-  if (xStepper) {
-    xStepper->disableOutputs();
-  }
+  // Stopped — only "at target" if the current position is within tolerance of
+  // the commanded target. This distinguishes a completed move from a
+  // force-stopped-short condition.
+  return abs(motor->getCurrentPosition() - motor->targetPos())
+             <= MOTOR_AT_TARGET_TOLERANCE_STEPS;
 } 

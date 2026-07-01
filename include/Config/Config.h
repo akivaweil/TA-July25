@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 // GLOBAL CONFIGURATION
 // Mechanical settings used for step calculations across all states
 // State-specific settings have been moved to their respective state files:
@@ -28,3 +30,9 @@ extern int Z_ACCELERATION;     // Z acceleration (steps/sec²)
 
 // INPUT DEBOUNCE SETTINGS
 extern float Z_HOME_SWITCH_DEBOUNCE_MS;  // Z home switch debounce (ms)
+extern const uint16_t X_HOME_SWITCH_DEBOUNCE_MS;  // X home switch debounce (ms)
+extern const uint16_t INPUT_DEBOUNCE_MS;          // start/stage signal debounce (ms)
+
+// WIFI LINK SCORE (dashboard 1–10 connection score, mapped from RSSI)
+extern const int8_t WIFI_RSSI_BEST_DBM;   // RSSI at/above this scores 10/10
+extern const int8_t WIFI_RSSI_WORST_DBM;  // RSSI at/below this scores 1/10

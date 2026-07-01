@@ -1,3 +1,23 @@
 {
-    "idf.pythonInstallPath": "/opt/homebrew/bin/python3"
+    "idf.pythonInstallPath": "/opt/homebrew/bin/python3",
+    "peacock.color": "#395406",
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#598409",
+        "activityBar.background": "#598409",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#6ac4f5",
+        "activityBarBadge.foreground": "#15202b",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#598409",
+        "statusBar.background": "#395406",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#598409",
+        "statusBarItem.remoteBackground": "#395406",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#395406",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#39540699",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    }
 }

@@ -40,7 +40,6 @@ enum PickupState {
 enum TransportState {
   TRANSPORT_ROTATE_SERVO,
   TRANSPORT_MOVE_TO_OVERSHOOT,
-  TRANSPORT_WAIT_SERVO,
   TRANSPORT_MOVE_TO_DROPOFF,
   TRANSPORT_DONE
 };
@@ -86,5 +85,3 @@ bool isMotorAtTarget(FastAccelStepper* motor);
 bool waitForTime(unsigned long duration);
 void activateVacuum();
 void deactivateVacuum();
-void enableXMotor();
-void disableXMotor();

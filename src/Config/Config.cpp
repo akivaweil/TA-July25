@@ -22,3 +22,9 @@ int Z_ACCELERATION = 10000;    // Z acceleration (steps/sec²)
 
 // INPUT DEBOUNCE SETTINGS
 float Z_HOME_SWITCH_DEBOUNCE_MS = 2.0;  // Z home switch debounce (ms)
+const uint16_t X_HOME_SWITCH_DEBOUNCE_MS = 10;  // X home switch debounce (ms)
+const uint16_t INPUT_DEBOUNCE_MS = 10;          // start/stage signal debounce (ms)
+
+// WIFI LINK SCORE (dashboard 1–10 connection score, mapped from RSSI)
+const int8_t WIFI_RSSI_BEST_DBM = -50;   // RSSI at/above this scores 10/10
+const int8_t WIFI_RSSI_WORST_DBM = -90;  // RSSI at/below this scores 1/10
