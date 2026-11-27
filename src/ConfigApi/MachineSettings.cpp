@@ -15,6 +15,7 @@ float Z_PICKUP_LOWER_INCHES  = 6.35f;
 int   SERVO_PICKUP_POS       = 52;
 int   PICKUP_HOLD_TIME       = 100;
 float X_DROPOFF_INCHES       = 20.75f;
+float X_SERVO_ROTATE_LEAD_INCHES = 2.0f;  // Servo turns to dropoff orientation this far before X reaches dropoff
 int   SERVO_TRAVEL_POS       = 32;
 int   SERVO_DROPOFF_POS      = 113;
 float Z_DROPOFF_LOWER_INCHES = 6.65f;
@@ -51,7 +52,6 @@ extern const float Z_HOME_OFFSET_INCHES;            // 01_HOMING.cpp
 extern const float Z_SUCTION_START_INCHES;          // 02_PICKUP.cpp
 extern const float Z_TRANSPORT_RAISE_OFFSET_INCHES; // 02_PICKUP.cpp
 extern const float X_OVERSHOOT_OFFSET_INCHES;       // 03_TRANSPORT.cpp
-extern const float X_SERVO_ROTATE_LEAD_INCHES;      // 03_TRANSPORT.cpp
 extern const float Z_EARLY_RETURN_INCHES;           // 04_DROPOFF.cpp
 
 // NVS persistence
@@ -79,6 +79,7 @@ void saveSettings() {
   prefs.putInt("servoPick", SERVO_PICKUP_POS);
   prefs.putInt("pickHold", PICKUP_HOLD_TIME);
   prefs.putFloat("xDropIn", X_DROPOFF_INCHES);
+  prefs.putFloat("xRotLeadIn", X_SERVO_ROTATE_LEAD_INCHES);
   prefs.putInt("servoTravel", SERVO_TRAVEL_POS);
   prefs.putInt("servoDrop", SERVO_DROPOFF_POS);
   prefs.putFloat("zDropLowIn", Z_DROPOFF_LOWER_INCHES);
@@ -135,6 +136,7 @@ void loadSettings() {
   SERVO_PICKUP_POS       = prefs.getInt("servoPick", SERVO_PICKUP_POS);
   PICKUP_HOLD_TIME       = prefs.getInt("pickHold", PICKUP_HOLD_TIME);
   X_DROPOFF_INCHES       = prefs.getFloat("xDropIn", X_DROPOFF_INCHES);
+  X_SERVO_ROTATE_LEAD_INCHES = prefs.getFloat("xRotLeadIn", X_SERVO_ROTATE_LEAD_INCHES);
   SERVO_TRAVEL_POS       = prefs.getInt("servoTravel", SERVO_TRAVEL_POS);
   SERVO_DROPOFF_POS      = prefs.getInt("servoDrop", SERVO_DROPOFF_POS);
   Z_DROPOFF_LOWER_INCHES = prefs.getFloat("zDropLowIn", Z_DROPOFF_LOWER_INCHES);

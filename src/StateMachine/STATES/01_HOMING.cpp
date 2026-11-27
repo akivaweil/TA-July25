@@ -59,11 +59,9 @@ bool handleHomingState() {
 
   switch(homingStep) {
     case 0:  // Start Z homing
-      // Fail-safe: force vacuum and the Stage 2 signal to their OFF/safe state at
-      // the start of homing (not just at boot), so a re-home from any state can
-      // never leave the gripper holding or Stage 2 asserted.
+      // Fail-safe: force vacuum to its OFF/safe state at the start of homing (not
+      // just at boot), so a re-home from any state can never leave the gripper holding.
       digitalWrite(SOLENOID_RELAY_PIN, LOW);  // Vacuum off
-      digitalWrite(STAGE2_SIGNAL_PIN, LOW);   // Stage 2 signal off
       vacuumActive = false;
 
       if (zStepper) {

@@ -14,6 +14,7 @@ extern float Z_PICKUP_LOWER_INCHES;  // Lower Z for pickup (in)
 extern int   SERVO_PICKUP_POS;       // Pickup servo orientation (deg)
 extern int   PICKUP_HOLD_TIME;       // Hold time at pickup (ms)
 extern float X_DROPOFF_INCHES;       // X dropoff position (in)
+extern float X_SERVO_ROTATE_LEAD_INCHES; // Servo starts turning to dropoff orientation this far before dropoff (in)
 extern int   SERVO_TRAVEL_POS;       // Travel servo orientation (deg) [shared w/ pickup]
 extern int   SERVO_DROPOFF_POS;      // Dropoff servo orientation (deg)
 extern float Z_DROPOFF_LOWER_INCHES; // Lower Z for dropoff (in)       [shared w/ transport]

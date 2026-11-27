@@ -6,8 +6,9 @@
 #include "OTA/OTA_Upload.h"
 #include "ConfigApi/MachineSettings.h"
 #include "ConfigApi/MachineConfigApi.h"
-#include "soc/soc.h"
-#include "soc/rtc_cntl_reg.h"
+#include "LinkEvents.h"
+#include "LineLink.h"
+#include <brownout.h>
 #include "esp_task_wdt.h"
 
 // Task watchdog timeout (seconds): if the loop task (state machine) stalls for
@@ -26,6 +27,7 @@ bool handleIdleState();
 bool handlePickupState();
 bool handleTransportState();
 bool handleDropoffState();
+bool handleSuctionFailureReturnState();
 void handleSerial();
 
 // OTA function declarations (implemented in OTA_Upload.cpp)
@@ -41,8 +43,7 @@ ServoControl swivelArmServo;
 // Bounce2 objects
 Bounce xHomeSwitch = Bounce();
 Bounce zHomeSwitch = Bounce();
-Bounce startButton = Bounce();
-Bounce stage1Signal = Bounce();
+linelink::SwitchButton<Bounce> startButton(linelink::SWITCH_TA_BUTTON_ON);
 Bounce stopSignalStage2 = Bounce();
 
 // State variables
@@ -57,6 +58,8 @@ bool vacuumActive = false;
 
 // Setup function
 void setup() {
+  esp_brownout_disable();
+
   // Initialize Serial communication
   Serial.begin(115200);
   Serial.println("[TA] booting");
@@ -64,6 +67,9 @@ void setup() {
   
   // Initialize OTA functionality (connects WiFi)
   setupOTA();
+
+  // Start the LineLink ESP-NOW layer (machine-to-machine messaging)
+  setupLineLink();
 
   // Load persisted curated settings from NVS (seeds defaults on first boot)
   loadSettings();
@@ -101,8 +107,6 @@ void setup() {
 // Setup functions
 void setupPins() {
   // Input pins
-  pinMode(START_BUTTON_PIN, INPUT_PULLDOWN);
-  pinMode(STAGE1_SIGNAL_PIN, INPUT_PULLDOWN);
   pinMode(X_HOME_SWITCH_PIN, INPUT_PULLDOWN);
   pinMode(Z_HOME_SWITCH_PIN, INPUT_PULLDOWN);
   pinMode(STOP_SIGNAL_STAGE_2, INPUT_PULLDOWN);
@@ -110,12 +114,10 @@ void setupPins() {
   // Output pins
   pinMode(X_ENABLE_PIN, OUTPUT);
   pinMode(SOLENOID_RELAY_PIN, OUTPUT);
-  pinMode(STAGE2_SIGNAL_PIN, OUTPUT);
   
   // Initial states
   digitalWrite(X_ENABLE_PIN, LOW);   // Enable X motor for smooth operation
   digitalWrite(SOLENOID_RELAY_PIN, LOW);  // Vacuum off
-  digitalWrite(STAGE2_SIGNAL_PIN, LOW);   // Stage 2 signal off
 }
 
 void setupDebouncers() {
@@ -128,11 +130,8 @@ void setupDebouncers() {
   zHomeSwitch.interval((uint16_t)Z_HOME_SWITCH_DEBOUNCE_MS);
 
   // Configure input signals with debounce
-  startButton.attach(START_BUTTON_PIN);
+  startButton.begin();
   startButton.interval(INPUT_DEBOUNCE_MS);
-
-  stage1Signal.attach(STAGE1_SIGNAL_PIN);
-  stage1Signal.interval(INPUT_DEBOUNCE_MS);
 
   stopSignalStage2.attach(STOP_SIGNAL_STAGE_2);
   stopSignalStage2.interval(INPUT_DEBOUNCE_MS);
@@ -145,7 +144,10 @@ void setupSteppers() {
   if (xStepper) {
     xStepper->setDirectionPin(X_DIR_PIN);
     xStepper->setEnablePin(X_ENABLE_PIN);
-    xStepper->setAutoEnable(true);
+    // X driver stays enabled (holding) at all times; updateXIdleDisable() turns
+    // it off only after a long IDLE and back on when IDLE ends.
+    xStepper->setAutoEnable(false);
+    xStepper->enableOutputs();
     xStepper->setSpeedInHz(X_MAX_SPEED);
     xStepper->setAcceleration(X_ACCELERATION);
   }
@@ -165,8 +167,8 @@ void loop() {
   // Feed the task watchdog each iteration.
   esp_task_wdt_reset();
 
-  // Only accept OTA uploads while in IDLE or HOMING state
-  if (systemState == STATE_IDLE || systemState == STATE_HOMING) {
+  // Only accept OTA uploads while every machine on the line is idle (LineLink flash gate)
+  if (linelink::flashGate().allowed()) {
     handleOTA();
   }
 
@@ -185,9 +187,12 @@ void loop() {
   xHomeSwitch.update();
   zHomeSwitch.update();
   startButton.update();
-  stage1Signal.update();
   stopSignalStage2.update();
-  
+
+  // LineLink: Stage 1 pickup / suction-failure events in (a suction failure starts
+  // the return home at once), machine state out.
+  updateLineLink();
+
   // FastAccelStepper runs automatically via interrupts - no need to call run()
   
   // Main state machine
@@ -225,12 +230,24 @@ void loop() {
         lastCycleEndTime = millis();  // Record end time to enforce inter-cycle delay
       }
       break;
+
+    case STATE_SUCTION_FAILURE_RETURN:
+      if (handleSuctionFailureReturnState()) {
+        systemState = STATE_HOMING;
+      }
+      break;
       
   }
   
   // Handle serial commands
   handleSerial();
-  
+
+  // Servo signal off while idle / back on when leaving IDLE (after every state change above)
+  updateServoIdleRelax();
+
+  // X driver off after a long IDLE / back on when leaving IDLE
+  updateXIdleDisable();
+
   // Yield to other tasks to reduce CPU load
   delay(1);
 }
@@ -263,4 +280,4 @@ void handleSerial() {
       systemState = STATE_HOMING;
     }
   }
-} 
+}

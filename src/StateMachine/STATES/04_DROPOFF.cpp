@@ -3,6 +3,7 @@
 #include "ServoControl.h"
 #include "globals.h"
 #include "ConfigApi/MachineSettings.h"
+#include "LinkEvents.h"
 
 // External references to objects defined in main file
 extern FastAccelStepper *xStepper;
@@ -107,7 +108,7 @@ bool handleDropoffState() {
       // Z moved up enough - start X return AND Z homing in parallel (X does NOT home)
       if (zStepper && zStepper->getCurrentPosition() <= Z_EARLY_RETURN_POS) {
         swivelArmServo.write(SERVO_HOME_POS);
-        digitalWrite(STAGE2_SIGNAL_PIN, HIGH);
+        sendStage2Start();  // reliable LineLink event: Stage 2 starts its cycle
         // Start X moving back to the same pickup position (no X homing)
         if (xStepper) {
           xStepper->moveTo(X_PICKUP_POS);
@@ -145,7 +146,6 @@ bool handleDropoffState() {
     case DROPOFF_X_AT_PICKUP:
       // X reached pickup return position — now re-home X to correct any drift
       if (isMotorAtTarget(xStepper)) {
-        digitalWrite(STAGE2_SIGNAL_PIN, LOW);  // Turn off Stage 2 signal
         if (xStepper) {
           xStepper->setSpeedInHz(X_HOME_SPEED);
           xStepper->move(-50000);  // Move negative toward home switch

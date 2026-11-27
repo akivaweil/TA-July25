@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <ArduinoOTA.h>
 #include "esp_task_wdt.h"
+#include "LineLink.h"
 
 // OTA upload implementation
 // Barebones WiFi connection and Over-The-Air updates for the ESP32.
@@ -50,6 +51,7 @@ void setupOTA() {
 
   ArduinoOTA.onStart([]() {
     Serial.println("[TA] OTA start");
+    linelink::flashGate().setFlashing(true);   // tell the line (Stage 1 blinks green)
   });
 
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
@@ -64,6 +66,7 @@ void setupOTA() {
 
   ArduinoOTA.onError([](ota_error_t error) {
     Serial.printf("[TA] OTA error %u\n", error);
+    linelink::flashGate().setFlashing(false);
   });
   
   ArduinoOTA.begin();

@@ -5,18 +5,18 @@
 // gradient tool heading + 4px accent pill, blue gradient CTA, emerald/amber/
 // red status tints, Geist-style font stack — one card-grid panel per machine
 // behind a tab strip; default tab = Stage 1. Each panel is driven entirely by
-// that machine's /api/status + /api/config (same REST contract for all four).
+// that machine's /api/status. Machines with settings also use /api/config.
 // Stage 1's panel also carries the 3 Inch / Minis mode toggle (reserved
 // "__mode__" POST key), matching its old dashboard. Config sections are
-// collapsible (a group whose first field reports collapsed:true starts closed,
-// e.g. the Motors speed/accel block); fields flagged fromSteps are shown and
+// collapsible (all start closed; tap a heading to open/close,
+// the open ones are remembered across config reloads); fields flagged fromSteps are shown and
 // edited in inches/sec on the front end while the POST still sends steps
 // (using the machine's stepsPerInch), so the firmware contract is unchanged.
 extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Production Line Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
 <!-- Geist-style system font stack — rendered natively, no external font fetch -->
@@ -88,7 +88,7 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
 
   /* Tuesday root sizing: 16px on phones, viewport-relative on desktop so the
      layout stays proportionally consistent across screen widths. */
-  html { font-size: 16px; color-scheme: dark; forced-color-adjust: none; }
+  html { font-size: 16px; color-scheme: dark; forced-color-adjust: none; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
   @media (min-width: 768px) { html { font-size: clamp(13px, 0.926vw, 16px); } }
 
   /* Thin Tuesday scrollbars */
@@ -340,12 +340,13 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
   .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 0; padding: 0.75rem 0 0.25rem; }
   .hero-stat { text-align: center; padding: 0.25rem 0.75rem; }
   .hero-stat + .hero-stat { border-left: 1px solid var(--hairline); }
-  .cut-rates { border-top: 1px solid var(--hairline); margin-top: 0.5rem; padding-top: 0.625rem; }
-  .cut-rates-cap { font-size: 0.625rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; margin-bottom: 0.5rem; }
+  .cut-rates { border-top: 1px solid var(--hairline); margin-top: 0.75rem; padding-top: 1rem; }
+  .cut-rates-cap { font-size: 0.8125rem; color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; text-align: center; margin-bottom: 0.875rem; }
   .cut-rate-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
-  .cut-rate-cell { text-align: center; padding: 0.25rem 0.5rem; }
+  .cut-rate-cell { text-align: center; padding: 0.5rem 0.5rem; }
   .cut-rate-cell + .cut-rate-cell { border-left: 1px solid var(--hairline); }
-  .cut-rate-value { font-size: 1.25rem; font-weight: 700; line-height: 1; color: var(--text-main); font-variant-numeric: tabular-nums; }
+  .cut-rate-value { font-size: 2.75rem; font-weight: 700; line-height: 1; color: var(--text-main); font-variant-numeric: tabular-nums; }
+  .cut-rate-cell .label-sm { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; }
 
   /* Connection / Diagnostics — Tuesday glass-table rows: hairline dividers, white/5 hover */
   .stat-row {
@@ -376,6 +377,13 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
   .sensor-val { font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-main); font-variant-numeric: tabular-nums; }
   .sensor-led { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); transition: background-color var(--transition); flex: none; }
   .sensor-item.active .sensor-led { background: var(--accent-success); }
+  .switch-grid { grid-template-columns: 1fr; }
+  .switch-reading { display: grid; justify-items: end; gap: 0.125rem; flex-shrink: 0; margin-left: 0.5rem; }
+  .switch-count { color: var(--text-dim); font-size: 0.625rem; }
+  .switch-test { margin-bottom: 0.75rem; }
+  .switch-test-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  .switch-test-help { color: var(--text-dim); font-size: 0.75rem; margin: 0.5rem 0 0; }
+  .switch-passed { color: var(--accent-success); font-size: 0.7rem; }
 
   /* Mode Toggle — exact Tuesday PageToggle (Orders/Planner switcher): gray-800/60
      track with inset gray-700/60 ring, gap-1 between options, sliding neutral
@@ -427,10 +435,11 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
     letter-spacing: 0.05em; text-transform: uppercase;
     margin: 0.75rem 0 0.5rem; padding-top: 0.625rem;
     border-top: 1px solid var(--hairline);
-    cursor: pointer; user-select: none;
+    cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
     transition: color var(--transition);
   }
   .section-heading:hover { color: var(--text-muted); }
+  .section-heading:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 4px; }
   .cfg-section:first-child .section-heading { border-top: 0; padding-top: 0; margin-top: 0; }
   .sec-chevron { width: 13px; height: 13px; flex: none; stroke-width: 2.5; color: var(--text-dim); transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
   .cfg-section.collapsed .sec-chevron { transform: rotate(-90deg); }
@@ -442,6 +451,7 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
   /* Config inputs — shadcn Input recipe */
   .input-group { margin-bottom: 0.625rem; }
   .input-group label { display: block; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0.375rem; font-weight: 500; line-height: 1.25; }
+  .input-hint { font-size: 0.75rem; color: var(--text-dim); margin: -0.25rem 0 0.375rem; line-height: 1.2; }
   .input-row { display: flex; gap: 0.5rem; align-items: center; }
   .input-group input[type="number"]::-webkit-outer-spin-button,
   .input-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -458,6 +468,7 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
     font-size: 0.875rem; font-variant-numeric: tabular-nums;
     transition: border-color var(--transition), box-shadow var(--transition);
   }
+  @media (pointer: coarse) { input[type="number"] { font-size: 16px; } }   /* iOS auto-zooms on focus below 16px */
   input:focus { outline: none; box-shadow: var(--focus-ring); }
   input:disabled { opacity: 0.5; cursor: not-allowed; }
   input.err { border-color: var(--accent-danger); }
@@ -490,12 +501,16 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
     /* Machine selector: 2x2 grid so all four tabs fit a vertical phone, no side-scroll. */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
     .tab { flex: none; min-width: 0; padding: 0.625rem 0.5rem; }
+    .tab:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .dashboard-grid { grid-template-columns: 1fr; gap: 0.75rem; }
     .col-span-4, .col-span-6, .col-span-8, .col-span-12 { grid-column: span 1; }
     .sensor-grid { grid-template-columns: 1fr; }
     .hero-stats { grid-template-columns: 1fr; }
     .hero-stat + .hero-stat { border-left: 0; border-top: 1px solid var(--hairline); margin-top: 0.5rem; padding-top: 0.625rem; }
+    /* Keep the cuts/min stats 4-across but shrink so the enlarged numbers fit a phone. */
+    .cut-rate-cell { padding: 0.375rem 0.25rem; }
+    .cut-rate-value { font-size: 1.875rem; }
     /* Mobile stacking: System Overview → Configuration → everything else. */
     .machine-panel .card { order: 3; }
     .machine-panel .hero-card { order: 1; }
@@ -529,14 +544,37 @@ extern const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html>
   <button class="btn btn-primary" id="backupBtn">↓ Backup All</button>
 </footer>
 <script>
+const SWITCH_CONTROLLER = {
+  id:"switch-controller", name:"Switch Controller", base:"http://192.168.1.230",
+  fallback:"http://switch-controller.local", readOnly:true,
+};
 const MACHINES = [
   { id:"stage1", name:"Stage 1",      base:"http://192.168.1.251", hasMode:true },
   { id:"ta",     name:"Transfer Arm", base:"" },
   { id:"stage2", name:"Stage 2",      base:"http://192.168.1.253" },
   { id:"router", name:"Router",       base:"http://192.168.1.250" },
+  SWITCH_CONTROLLER,
+];
+const CONFIG_MACHINES = MACHINES.filter(m => !m.readOnly);
+const SWITCH_INPUTS = [
+  { key:"runCycle", label:"Run Cycle" },
+  { key:"reloadMode", label:"Reload Mode" },
+  { key:"transferArmManualStart", label:"Transfer Arm Manual Start", momentary:true },
+  { key:"stage2ManualStart", label:"Stage 2 Manual Start", momentary:true },
+  { key:"spareSwitch", label:"Unassigned Switch", momentary:false },
 ];
 const DEFAULT_TAB = "stage1";
 const POLL_MS = 2000, TIMEOUT_MS = 1500;
+const MDNS_TIMEOUT_MS = 6500;
+const OFFLINE_AFTER_MISSES = 2;      // consecutive missed status polls before a machine shows offline
+const CONFIG_POST_TIMEOUT_MS = 4000; // a busy machine may answer a settings save slower than a status poll
+const SECTION_TAP_SLOP_PX = 10;        // finger drift beyond this = a scroll/swipe, not a tap on a settings heading
+const SECTION_SCROLL_SETTLE_MS = 250;  // a touch within this long of the page scrolling is stopping a flick, not a tap
+const HAPTIC_TOGGLE_MS = 15;       // short buzz when a section toggles (phones that support it)
+// Small explainer shown under a setting's label, keyed "machineId:FIELD_KEY".
+const FIELD_HINTS = {
+  "stage1:ROTATION_SERVO_HOME_POSITION": "Lower = closer to blade",
+};
 const STAGE_GLIDE_MS = 360;  // tab-tap page glide duration (scroll + height animate together)
 const RECONCILE_EVERY = 8;  // every Nth poll, re-pull /api/config to catch reboots + applied deferrals
 const UPTIME_RESYNC_MS = 5000;  // device-clock gap beyond this = reboot/long gap → hard re-anchor the uptime readout
@@ -549,6 +587,32 @@ let stageMoving = false;    // true while the carousel is being swiped/animated
 let animFrame = null;       // rAF id while a tab-tap glide is animating (null = manual swipe / idle)
 let relayoutQueued = false;
 let settleTimer = null;
+
+// Settings sections open/close on a real tap only: the finger must lift near where it landed, the
+// browser must not have taken the touch for a scroll, and the page must not have been scrolling when
+// the finger came down (that touch is just stopping a flick). Enter/Space also works from a keyboard.
+let lastScrollAt = 0;
+document.addEventListener("scroll", () => { lastScrollAt = Date.now(); }, { capture: true, passive: true });
+function tapToToggle(head, toggle) {
+  let valid = false, x0 = 0, y0 = 0;
+  head.addEventListener("pointerdown", e => {
+    if (e.button) return;
+    valid = Date.now() - lastScrollAt > SECTION_SCROLL_SETTLE_MS;
+    x0 = e.clientX; y0 = e.clientY;
+  });
+  head.addEventListener("pointermove", e => { if (valid && Math.hypot(e.clientX - x0, e.clientY - y0) > SECTION_TAP_SLOP_PX) valid = false; });
+  head.addEventListener("pointercancel", () => { valid = false; });   // browser took the touch for a scroll
+  document.addEventListener("scroll", () => { valid = false; }, { capture: true, passive: true });
+  head.addEventListener("pointerup", e => {
+    const ok = valid && Math.hypot(e.clientX - x0, e.clientY - y0) <= SECTION_TAP_SLOP_PX;
+    valid = false;
+    if (ok) { toggle(); if (navigator.vibrate) navigator.vibrate(HAPTIC_TOGGLE_MS); }
+  });
+  head.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+}
+// No pinch/double-tap zoom on phones (iOS Safari ignores user-scalable=no, so block its gesture events too).
+["gesturestart", "gesturechange", "gestureend"].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
 function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 function svg(paths) {
@@ -587,9 +651,9 @@ function syncUptime(s, uptimeMs) {
   else s.uptimeEpoch += (implied - s.uptimeEpoch) * UPTIME_SLEW;
 }
 
-async function fetchJSON(url, opts) {
+async function fetchJSON(url, opts, timeoutMs) {
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const t = setTimeout(() => ctrl.abort(), timeoutMs || TIMEOUT_MS);
   try {
     const r = await fetch(url, Object.assign({ signal:ctrl.signal }, opts || {}));
     const body = await r.text();
@@ -604,8 +668,8 @@ function buildPanel(m) {
   const panel = el("div", "machine-panel");
   const grid = el("div", "dashboard-grid");
 
-  // --- Hero / System Overview (col-span-8) ---
-  const hero = el("div", "card hero-card col-span-8 fade-in");
+  // --- Hero / System Overview ---
+  const hero = el("div", "card hero-card fade-in " + (m.readOnly ? "col-span-6" : "col-span-8"));
   const hHead = el("div", "card-header");
   hHead.style.justifyContent = "space-between";
   const hLeft = el("div"); hLeft.style.display = "flex"; hLeft.style.alignItems = "center"; hLeft.style.gap = "0.5rem";
@@ -645,6 +709,42 @@ function buildPanel(m) {
   hero.appendChild(s.cutRates);
   grid.appendChild(hero);
 
+  if (!m.readOnly) grid.appendChild(buildConfigCard(s));
+
+  // --- Sensor Matrix (col-span-4) ---
+  const sens = el("div", "card fade-in " + (m.readOnly ? "col-span-6" : "col-span-4"));
+  const sHead = el("div", "card-header");
+  sHead.appendChild(svg(["M15 12a3 3 0 11-6 0 3 3 0 016 0z", "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"]));
+  sHead.appendChild(el("span", null, m.readOnly ? "Switch Inputs" : "Sensor Matrix"));
+  sens.appendChild(sHead);
+  if (m.readOnly) sens.appendChild(buildSwitchTest(s));
+  s.sensors = el("div", m.readOnly ? "sensor-grid switch-grid" : "sensor-grid");
+  if (m.readOnly) renderSwitchInputs(s, {});
+  else s.sensors.appendChild(el("div", "cfg-empty", "—"));
+  sens.appendChild(s.sensors);
+  grid.appendChild(sens);
+
+  // --- Connection / Diagnostics (col-span-4) ---
+  const diag = el("div", "card fade-in " + (m.readOnly ? "col-span-12" : "col-span-4"));
+  const dHead = el("div", "card-header");
+  dHead.appendChild(svg(["M8.111 16.404a5.5 5.5 0 017.778 0M5.282 13.575a9.5 9.5 0 0113.436 0M1.394 9.686a15 15 0 0121.212 0M12 20h.01"]));
+  dHead.appendChild(el("span", null, "Connection"));
+  diag.appendChild(dHead);
+  const wrap = el("div");
+  s.dHealth = mkStatRow(wrap, "Health", "—");
+  s.address = mkStatRow(wrap, "Address", m.base || "same origin");
+  s.linkWrap = el("div", "link-rows");   // one compact row per peer machine (ESP-NOW LineLink)
+  wrap.appendChild(s.linkWrap);
+  diag.appendChild(wrap);
+  grid.appendChild(diag);
+
+  panel.appendChild(grid);
+  s.panel = panel;
+  return panel;
+}
+
+function buildConfigCard(s) {
+  const m = s.m;
   // --- Configuration (right column, tall) ---
   const cfg = el("div", "card col-span-4 config-card fade-in");
   const cHead = el("div", "card-header");
@@ -675,34 +775,8 @@ function buildPanel(m) {
   s.fields.appendChild(el("div", "cfg-empty", "waiting for connection…"));
   cfg.appendChild(s.fields);
   s.cfgStatus = el("div", "cfg-status"); cfg.appendChild(s.cfgStatus);
-  grid.appendChild(cfg);
+  return cfg;
 
-  // --- Sensor Matrix (col-span-4) ---
-  const sens = el("div", "card col-span-4 fade-in");
-  const sHead = el("div", "card-header");
-  sHead.appendChild(svg(["M15 12a3 3 0 11-6 0 3 3 0 016 0z", "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"]));
-  sHead.appendChild(el("span", null, "Sensor Matrix"));
-  sens.appendChild(sHead);
-  s.sensors = el("div", "sensor-grid");
-  s.sensors.appendChild(el("div", "cfg-empty", "—"));
-  sens.appendChild(s.sensors);
-  grid.appendChild(sens);
-
-  // --- Connection / Diagnostics (col-span-4) ---
-  const diag = el("div", "card col-span-4 fade-in");
-  const dHead = el("div", "card-header");
-  dHead.appendChild(svg(["M8.111 16.404a5.5 5.5 0 017.778 0M5.282 13.575a9.5 9.5 0 0113.436 0M1.394 9.686a15 15 0 0121.212 0M12 20h.01"]));
-  dHead.appendChild(el("span", null, "Connection"));
-  diag.appendChild(dHead);
-  const wrap = el("div");
-  s.dHealth = mkStatRow(wrap, "Health", "—");
-  mkStatRow(wrap, "Address", m.base || "same origin");
-  diag.appendChild(wrap);
-  grid.appendChild(diag);
-
-  panel.appendChild(grid);
-  s.panel = panel;
-  return panel;
 }
 
 function mkStatRow(parent, key, val) {
@@ -809,14 +883,47 @@ function onStageScroll() {
   settleTimer = setTimeout(endStageMove, 130);         // motion settled: re-snap + shrink to the active page
 }
 
+async function fetchStatus(m, base, timeoutMs) {
+  let r;
+  try { r = await fetchJSON(base + "/api/status", undefined, timeoutMs); } catch (e) {}
+  if (!r || !r.ok || !r.json || (m.readOnly && r.json.id !== m.id)) return null;
+  return r.json;
+}
+
 // Live status poll
 async function poll(m) {
   const s = ST[m.id];
-  let r = null;
-  try { r = await fetchJSON(m.base + "/api/status"); } catch (e) {}
-  if (!r || !r.ok || !r.json) { setOffline(s); return; }
-  setOnline(s, r.json);
-  if (!s.configLoaded && !s.configLoading) loadConfig(s);  // auto-load curated fields once online
+  let address = m.base;
+  let status = await fetchStatus(m, address);
+  if (!status && m.fallback) {
+    address = m.fallback;
+    status = await fetchStatus(m, address, MDNS_TIMEOUT_MS);
+  }
+  if (!status) {
+    s.misses = (s.misses || 0) + 1;            // one slow reply (busy mid-cycle) isn't "offline"
+    if (m.readOnly) {
+      updateSwitchTest(s, null);
+      renderSwitchInputs(s, {});
+    }
+    if (s.misses >= OFFLINE_AFTER_MISSES) setOffline(s);
+    return;
+  }
+  s.misses = 0;
+  if (m.fallback) s.address.textContent = address;
+  setOnline(s, status);
+  if (!m.readOnly && !s.configLoaded && !s.configLoading) loadConfig(s);  // auto-load curated fields once online
+}
+
+let switchPollPending = false;
+async function pollSwitchController() {
+  if (switchPollPending) return;
+  switchPollPending = true;
+  try {
+    await poll(SWITCH_CONTROLLER);
+    updateSummary();
+  } finally {
+    switchPollPending = false;
+  }
 }
 
 function setOnline(s, d) {
@@ -840,11 +947,15 @@ function setOnline(s, d) {
   s.dHealth.textContent = h;
   s.dHealth.style.color = h === "HEALTHY" ? "var(--accent-success)" : h === "WARNING" ? "var(--accent-warning)" : h === "ERROR" ? "var(--accent-danger)" : "var(--text-main)";
 
-  renderSensors(s, d.sensors || {});
+  if (s.m.readOnly) {
+    updateSwitchTest(s, d);
+    renderSwitchInputs(s, d.sensors || {}, d.pressCounts);
+  } else renderSensors(s, d.sensors || {});
+  renderLinks(s, d.link);
 
   if (s.m.hasMode && d.mode != null && s._modePending == null) updateModeUI(s, d.mode, false);
 
-  s.fields.querySelectorAll("input").forEach(i => i.disabled = false);  // re-enable once reachable
+  s.fields?.querySelectorAll("input").forEach(i => i.disabled = false);  // re-enable once reachable
 }
 
 function setOffline(s) {
@@ -856,7 +967,115 @@ function setOffline(s) {
   s.healthBadge.className = "badge UNK"; s.healthBadge.textContent = "—";
   s.uptimeText = null; s.uptime.textContent = "--:--:--";   // keep uptimeEpoch so a transient drop resumes smoothly
   s.dHealth.textContent = "—"; s.dHealth.style.color = "var(--text-dim)";
-  s.fields.querySelectorAll("input").forEach(i => i.disabled = true);
+  s.linkWrap.innerHTML = "";
+  if (s.m.readOnly) {
+    renderSwitchInputs(s, {});
+    s.address.textContent = s.m.base;
+  }
+  // Never lock the field being edited: disabling it blurs it, which would drop the edit.
+  s.fields?.querySelectorAll("input").forEach(i => { if (i !== document.activeElement) i.disabled = true; });
+  scheduleRelayout();
+}
+
+// Compact link row per peer: alive + heartbeat age, events acked/sent, retries, failures.
+function renderLinks(s, link) {
+  const peers = (link && link.peers) || [];
+  s.linkWrap.innerHTML = "";
+  peers.forEach(p => {
+    const row = el("div", "stat-row");
+    row.appendChild(el("span", "k", "Link \u2192 " + p.name));
+    const txt = p.alive
+      ? p.ageMs + " ms \u00b7 " + p.acked + "/" + p.tx + " ack \u00b7 " + p.retries + " rt \u00b7 " + p.failed + " fail"
+      : "silent";
+    const v = el("span", "v", txt);
+    v.style.color = !p.alive ? "var(--accent-danger)" : p.failed ? "var(--accent-warning)" : "var(--accent-success)";
+    row.appendChild(v);
+    s.linkWrap.appendChild(row);
+  });
+  scheduleRelayout();
+}
+
+function buildSwitchTest(s) {
+  const panel = el("div", "switch-test");
+  const bar = el("div", "switch-test-bar");
+  bar.appendChild(el("strong", null, "Test Mode"));
+  s.switchTestButton = el("button", "btn", "Start check");
+  s.switchTestButton.type = "button";
+  s.switchTestButton.disabled = true;
+  s.switchTestButton.onclick = () => {
+    const d = s.switchStatus;
+    if (!canCheckSwitches(d)) return;
+    s.switchTest = { initial: d, lastUptimeMs: d.uptimeMs, changed: new Set(), passed: new Set() };
+    updateSwitchTest(s, d);
+    renderSwitchInputs(s, d.sensors, d.pressCounts);
+  };
+  bar.appendChild(s.switchTestButton);
+  panel.appendChild(bar);
+  s.switchTestHelp = el("p", "switch-test-help", "Waiting for the controller to confirm test mode.");
+  s.switchTestHelp.setAttribute("aria-live", "polite");
+  panel.appendChild(s.switchTestHelp);
+  return panel;
+}
+
+function canCheckSwitches(d) {
+  return d?.commandsEnabled === false && d.state === "MONITOR_ONLY" &&
+    Number.isFinite(d.uptimeMs) &&
+    SWITCH_INPUTS.every(({ key, momentary }) => typeof d.sensors?.[key] === "boolean" &&
+      (!momentary || Number.isInteger(d.pressCounts?.[key])));
+}
+
+function updateSwitchTest(s, d) {
+  s.switchStatus = d;
+  const ready = canCheckSwitches(d);
+  let test = s.switchTest;
+  const interrupted = test && (!ready || d.uptimeMs < test.lastUptimeMs);
+  if (interrupted) test = s.switchTest = null;
+  s.switchTestButton.disabled = !ready;
+  s.switchTestButton.textContent = test ? "Restart check" : "Start check";
+
+  let message = "Waiting for the controller to confirm test mode.";
+  if (d?.commandsEnabled === true) message = "Machine commands enabled. Switch check unavailable.";
+  else if (ready) message = "Machine commands blocked. Start a check to verify each switch.";
+  if (interrupted && ready) message = "Controller restarted. Start a new check.";
+
+  if (test) {
+    test.lastUptimeMs = d.uptimeMs;
+    SWITCH_INPUTS.forEach(({ key, momentary }) => {
+      if (momentary) {
+        if (d.pressCounts[key] > test.initial.pressCounts[key]) test.passed.add(key);
+      } else if (d.sensors[key] !== test.initial.sensors[key]) {
+        test.changed.add(key);
+      } else if (test.changed.has(key)) {
+        test.passed.add(key);
+      }
+    });
+    message = test.passed.size === SWITCH_INPUTS.length ? "All five inputs checked."
+      : test.passed.size + " / " + SWITCH_INPUTS.length + " checked. Toggle each switch away and back. Press both buttons once.";
+  }
+  if (s.switchTestHelp.textContent !== message) s.switchTestHelp.textContent = message;
+}
+
+function renderSwitchInputs(s, sensors, pressCounts) {
+  s.sensors.innerHTML = "";
+  SWITCH_INPUTS.forEach(({ key, label, momentary }) => {
+    const active = sensors[key];
+    const item = el("div", active === true ? "sensor-item active" : "sensor-item");
+    const reading = el("div", "switch-reading");
+    const value = typeof active !== "boolean" ? "—" : momentary
+      ? (active ? "Pressed" : "Released")
+      : (active ? "On" : "Off");
+    reading.appendChild(el("span", "sensor-val", value));
+    const count = momentary ? pressCounts?.[key] : undefined;
+    if (Number.isInteger(count) && count >= 0) {
+      reading.appendChild(el("span", "switch-count", count + (count === 1 ? " press" : " presses")));
+    }
+    if (s.switchTest?.passed.has(key)) reading.appendChild(el("span", "switch-passed", "Checked"));
+    const pin = s.switchStatus?.pins?.[key];
+    const pinLabel = Number.isInteger(pin) ? label + " (GPIO" + pin + ")" : label;
+    item.appendChild(el("span", "sensor-label", pinLabel));
+    item.appendChild(reading);
+    s.sensors.appendChild(item);
+  });
   scheduleRelayout();
 }
 
@@ -895,11 +1114,21 @@ async function loadConfig(s) {
   let lastGroup = null, inner = null;
   r.json.fields.forEach(f => {
     if (f.group && f.group !== lastGroup) {  // start a new collapsible section
-      const sec = el("div", "cfg-section" + (f.collapsed ? " collapsed" : ""));
+      const groupName = f.group;
+      s.openSections = s.openSections || new Set();   // sections the user opened; everything else starts compact
+      const sec = el("div", "cfg-section" + (s.openSections.has(groupName) ? "" : " collapsed"));
       const head = el("div", "section-heading");
+      head.tabIndex = 0; head.setAttribute("role", "button");
+      head.title = "Tap to open or close";
+      head.setAttribute("aria-expanded", s.openSections.has(groupName) ? "true" : "false");
       head.appendChild(chevron());
-      head.appendChild(el("span", null, f.group));
-      head.onclick = () => { sec.classList.toggle("collapsed"); scheduleRelayout(); setTimeout(scheduleRelayout, 240); };
+      head.appendChild(el("span", null, groupName));
+      tapToToggle(head, () => {
+        const open = sec.classList.toggle("collapsed") === false;
+        if (open) s.openSections.add(groupName); else s.openSections.delete(groupName);
+        head.setAttribute("aria-expanded", open ? "true" : "false");
+        scheduleRelayout(); setTimeout(scheduleRelayout, 240);
+      });
       const body = el("div", "cfg-section-body");
       inner = el("div", "cfg-section-inner");
       body.appendChild(inner);
@@ -910,6 +1139,8 @@ async function loadConfig(s) {
     const conv = !!(f.fromSteps && spi > 0);   // show this field in inches/sec instead of steps
     const group = el("div", "input-group");
     group.appendChild(el("label", null, f.label || f.key));
+    const hint = FIELD_HINTS[s.m.id + ":" + f.key];
+    if (hint) group.appendChild(el("div", "input-hint", hint));
     const rowEl = el("div", "input-row");
     const inp = document.createElement("input");
     inp.type = "number"; inp.inputMode = "decimal";
@@ -977,7 +1208,11 @@ function setStat(stat, kind, glyph, title, fade) {
 
 // Save-on-blur: POST just this field if it changed and is in range.
 async function commitField(s, inp, stat, f) {
-  if (inp.disabled) { inp.value = inp.dataset.orig; inp.classList.remove("err"); setStat(stat); return; }
+  if (inp.disabled || !s.online) {
+    inp.value = inp.dataset.orig; inp.classList.remove("err");
+    if (inp.disabled) { setStat(stat); return; }
+    setStat(stat, "warn", "⚠", "machine offline — not saved"); return;
+  }
   const raw = inp.value.trim();
   const spi = Number(inp.dataset.spi) || 0;   // >0 → field shown in inches/sec, stored in steps
   const conv = spi > 0;
@@ -1010,7 +1245,7 @@ async function commitField(s, inp, stat, f) {
   try {
     r = await fetchJSON(s.m.base + "/api/config", {
       method:"POST", headers:{ "Content-Type":"text/plain" }, body:JSON.stringify(payload),
-    });
+    }, CONFIG_POST_TIMEOUT_MS);
   } catch (e) {}
   if (inp._gen !== gen) return;  // superseded by a newer edit
   const j = (r && r.json) || {};
@@ -1057,7 +1292,7 @@ async function setMachineMode(s, mode) {
   try {
     r = await fetchJSON(s.m.base + "/api/config", {
       method:"POST", headers:{ "Content-Type":"text/plain" }, body:JSON.stringify({ __mode__: mode }),
-    });
+    }, CONFIG_POST_TIMEOUT_MS);
   } catch (e) {}
   s._modePending = null;
   const j = (r && r.json) || {};
@@ -1093,7 +1328,7 @@ async function backupAll() {
   btn.disabled = true; btn.textContent = "Backing up…";
   const out = { type:"production_line_config_backup", exportedAt:new Date().toISOString(), machines:{} };
   let okCount = 0;
-  await Promise.all(MACHINES.map(async m => {
+  await Promise.all(CONFIG_MACHINES.map(async m => {
     const s = ST[m.id];
     let r = null;
     try { r = await fetchJSON(m.base + "/api/config"); } catch (e) {}
@@ -1105,7 +1340,7 @@ async function backupAll() {
   }));
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
   downloadJSON(out, "production-line-config-" + ts + ".json");
-  btn.textContent = okCount === MACHINES.length ? "Saved ✓" : ("Saved " + okCount + "/" + MACHINES.length);
+  btn.textContent = okCount === CONFIG_MACHINES.length ? "Saved ✓" : ("Saved " + okCount + "/" + CONFIG_MACHINES.length);
   setTimeout(() => { btn.textContent = label; btn.disabled = false; }, 2200);
 }
 
@@ -1138,12 +1373,14 @@ setActive(active, "instant");   // land on the default page, snapped, no animati
 scheduleRelayout();
 document.getElementById("backupBtn").onclick = backupAll;
 async function tick() {
-  await Promise.all(MACHINES.map(poll));
+  // Slow mDNS resolution on the Switch Controller never delays other machines.
+  void pollSwitchController();
+  await Promise.all(CONFIG_MACHINES.map(poll));
   updateSummary();
   // Reconcile on the periodic cadence, plus every poll for any machine with a pending
   // deferred change so its ✓ lands promptly once the machine reaches idle.
   const periodic = pollCount++ % RECONCILE_EVERY === RECONCILE_EVERY - 1;
-  await Promise.all(MACHINES.map(m => {
+  await Promise.all(CONFIG_MACHINES.map(m => {
     const s = ST[m.id];
     if (periodic || hasPending(s)) return reconcileConfig(s);
   }));

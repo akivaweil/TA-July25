@@ -2,6 +2,7 @@
 
 #include <Bounce2.h>
 #include <FastAccelStepper.h>
+#include "LineLinkSwitchButton.h"
 #include "ServoControl.h"
 #include "Config/Config.h"
 #include "Config/Pins_Definitions.h"
@@ -10,8 +11,7 @@
 // Bounce2 objects for debounced inputs
 extern Bounce xHomeSwitch;
 extern Bounce zHomeSwitch;
-extern Bounce startButton;
-extern Bounce stage1Signal;
+extern linelink::SwitchButton<Bounce> startButton;
 extern Bounce stopSignalStage2;
 
 extern FastAccelStepperEngine engine;
@@ -26,6 +26,7 @@ enum SystemState {
   STATE_PICKUP,
   STATE_TRANSPORT,
   STATE_DROPOFF,
+  STATE_SUCTION_FAILURE_RETURN,
   STATE_HOMING
 };
 
@@ -75,9 +76,13 @@ void setupDebouncers();
 // State handler functions
 bool handleHomingState();
 bool handleIdleState();
+void updateServoIdleRelax();
+void updateXIdleDisable();
+bool isXMotorEnabled();
 bool handlePickupState();
 bool handleTransportState();
 bool handleDropoffState();
+bool handleSuctionFailureReturnState();
 void handleSerial();
 
 // Utility functions

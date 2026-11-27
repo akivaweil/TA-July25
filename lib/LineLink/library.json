@@ -1,0 +1,8 @@
+{
+  "name": "LineLink",
+  "version": "1.0.0",
+  "description": "ESP-NOW full-mesh messaging layer for the Everwood saw line (TA, Stage 1, Stage 2, Router)",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "build": { "srcDir": "src" }
+}

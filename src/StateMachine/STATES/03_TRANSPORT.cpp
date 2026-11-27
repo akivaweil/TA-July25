@@ -17,12 +17,11 @@ extern float STEPS_PER_INCH;
 extern int Z_DROPOFF_POS;
 
 // TRANSPORT STATE CONFIG
-// Curated settings (X_DROPOFF_INCHES, SERVO_TRAVEL_POS, SERVO_DROPOFF_POS) are
+// Curated settings (X_DROPOFF_INCHES, X_SERVO_ROTATE_LEAD_INCHES, SERVO_TRAVEL_POS, SERVO_DROPOFF_POS) are
 // now mutable globals owned by MachineSettings.cpp.
 
 // Non-curated derived-position inputs (extern const so applyTASettings() can use them)
 extern const float X_OVERSHOOT_OFFSET_INCHES = 2.3;   // 2.3" past dropoff for servo rotation
-extern const float X_SERVO_ROTATE_LEAD_INCHES = 2.0;  // Start servo rotation this far before dropoff
 
 // Calculated positions (steps) - maintained by applyTASettings()
 int X_DROPOFF_POS = 0;

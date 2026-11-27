@@ -4,6 +4,9 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include "ConfigApi/MachineSettings.h"
+#include "LineLink.h"
+#include "LineLinkAsyncWeb.h"
+#include "LinkEvents.h"
 #include "globals.h"
 #include "Config/Config.h"
 #include "Config/Pins_Definitions.h"
@@ -62,6 +65,7 @@ static const Field FIELDS[] = {
   { "PICKUP_HOLD_TIME",      "Pickup Hold (ms)",      "Pickup",     FT_INT,   10,    500,    10,    &PICKUP_HOLD_TIME, nullptr,        "pickHold",    false, false },
   { "X_DROPOFF_INCHES",      "X Dropoff (in)",        "Transport",  FT_FLOAT, 15.0f, 30.0f,  0.25f, nullptr, &X_DROPOFF_INCHES,       "xDropIn",     false, false },
   { "SERVO_TRAVEL_POS",      "Servo Travel (deg)",    "Transport",  FT_INT,   0,     180,    1,     &SERVO_TRAVEL_POS, nullptr,        "servoTravel", false, false },
+  { "X_SERVO_ROTATE_LEAD_INCHES", "Rotate Before Dropoff (in)", "Transport", FT_FLOAT, 0.0f, 15.0f, 0.1f, nullptr, &X_SERVO_ROTATE_LEAD_INCHES, "xRotLeadIn", false, false },
   { "SERVO_DROPOFF_POS",     "Servo Dropoff (deg)",   "Dropoff",    FT_INT,   0,     180,    1,     &SERVO_DROPOFF_POS, nullptr,       "servoDrop",   false, false },
   { "Z_DROPOFF_LOWER_INCHES","Z Dropoff Lower (in)",  "Dropoff",    FT_FLOAT, 3.0f,  10.0f,  0.1f,  nullptr, &Z_DROPOFF_LOWER_INCHES, "zDropLowIn",  false, false },
   { "DROPOFF_SETTLE_TIME",   "Dropoff Settle (ms)",   "Dropoff",    FT_INT,   10,    200,    5,     &DROPOFF_SETTLE_TIME, nullptr,     "dropSettle",  false, false },
@@ -89,6 +93,7 @@ static const char* stateName() {
     case STATE_PICKUP:    return "PICKUP";
     case STATE_TRANSPORT: return "TRANSPORT";
     case STATE_DROPOFF:   return "DROPOFF";
+    case STATE_SUCTION_FAILURE_RETURN: return "SUCTION_FAILURE_RETURN";
     default:              return "UNKNOWN";
   }
 }
@@ -125,9 +130,15 @@ String buildStatusJson() {
   sensors["xHome"]       = (digitalRead(X_HOME_SWITCH_PIN) == HIGH);
   sensors["zHome"]       = (zHomeSwitch.read() == HIGH);
   sensors["startButton"] = (startButton.read() == HIGH);
-  sensors["stage1"]      = (stage1Signal.read() == HIGH);
+  sensors["pickupRequested"] = pickupRequestActive();   // Stage 1 START_PICKUP held (LineLink)
   sensors["stopStage2"]  = (stopSignalStage2.read() == HIGH);
   sensors["vacuum"]      = vacuumActive;
+  sensors["xEnabled"]    = isXMotorEnabled();   // X driver holding (off after 2 min IDLE)
+
+  // Per-peer LineLink stats (alive, last-heard age, events tx/acked/retries/failed, rx, dups).
+  char linkJson[linelink::LINK_STATUS_JSON_CAP];
+  linelink::link().formatStatusJson(linkJson, sizeof(linkJson));
+  doc["link"] = serialized(linkJson);
 
   String out;
   serializeJson(doc, out);
@@ -263,6 +274,11 @@ static void addCors(AsyncWebServerResponse* res) {
 }
 
 void setupConfigApi(AsyncWebServer& server) {
+  // GET /api/linktest?to=<machine>&count=<n> - LineLink PING test (no motion)
+  linelink::registerLinkTestRoute(server);
+  // GET /api/flash[?request=1|?cancel=1] - upload slot (flash interlock)
+  linelink::registerFlashRoute(server);
+
   // GET /api/status
   server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest* request) {
     AsyncWebServerResponse* res =
